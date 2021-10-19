@@ -19,6 +19,12 @@ body {
     border: 2px dotted orange;
 }
 
+.carousel-caption {
+    margin-bottom: 1.25rem;
+    padding-top: revert;
+    padding-bottom: revert;
+}
+
 .zvyrazniTucnym {
     font-weight: bold;
     color: brown;
@@ -33,5 +39,5 @@ img {
 }
 
 .partialdark {
-       background: rgba(204, 204, 204, 0.5);
+       background: rgba(128, 128, 128, 0.5);
    }
