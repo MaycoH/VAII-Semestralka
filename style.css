@@ -10,13 +10,21 @@ body {
      border-color: yellow !important;
 }
 
+a.nav-link {
+    padding-left: 0.5rem !important;
+}
+
 .nav-link.active {
-    border: 2px solid white;
+    border: 1px solid white;
+    background-color: rgba(255, 80, 128, 0.5);
+    border-radius: 0.5rem;
 }
 
 .nav-link:hover {
     color: orange !important;
-    border: 2px dotted orange;
+    background-color: rgba(128, 80, 128, 0.5);
+    border: 1px dotted white;
+    border-radius: 0.5rem;
 }
 
 .carousel-caption {
