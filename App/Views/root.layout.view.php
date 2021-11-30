@@ -33,6 +33,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="?c=auth&a=loginForm">Prihlásenie</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="?c=auth&a=registerForm">Registrácia</a>
+                    </li>
                 <?php } else { ?>
                     <li class="nav-item">
                         <a class="nav-link" href="?c=home&a=addNewActuality">Pridať novú aktualitu</a>

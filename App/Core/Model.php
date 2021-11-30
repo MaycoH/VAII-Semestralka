@@ -62,7 +62,7 @@ abstract class Model implements \JsonSerializable
             $sql = "SELECT * FROM " . self::getTableName() . ($whereClause=='' ? '' : " WHERE $whereClause");
 
             $stmt = self::$connection->prepare($sql);
-            $stmt->execute($whereParams);
+            $exec = $stmt->execute($whereParams);
 
             $dbModels = $stmt->fetchAll();
             $models = [];
