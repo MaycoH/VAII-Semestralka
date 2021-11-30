@@ -2,6 +2,7 @@
 
 use App\Core\DB\Connection; ?>
 <?php
+$name = "index";
 ?>
 <div class="container">
     <div class="row">
@@ -30,7 +31,7 @@ use App\Core\DB\Connection; ?>
                 <div class="card-body">
                    <div class="row">
                     <div class="col col-11"><h1 class="card-title"><?= $aktualita->title ?></h1></div>
-                    <?php if(true) { //if (\App\Auth::isLogged()) { ?>
+                    <?php if (\App\Models\Auth::isLogged()) { ?>
                         <div class="col col-1 my-auto text-end">
                         <a href="?c=home&a=editActuality&postid=<?= $aktualita->id ?>" class="btn btn-warning"> <i class="bi bi-pencil"></i></a>
                         <a href="?c=home&a=removeActuality&postid=<?= $aktualita->id ?>" class="btn btn-danger"> <i class="bi bi-trash"></i></a>

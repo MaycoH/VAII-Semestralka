@@ -29,18 +29,17 @@
                     <a class="nav-link" href="?c=home&a=contact">Kontakt</a>
                 </li>
 
-<!--                --><?php //if (\App\Auth::isLogged()) { ?>
-                <?php if (!true) { ?>
-                <li class="nav-item">
-                    <a class="nav-link" href="?c=home&a=contact">Prihlásenie</a>
-                </li>
+                <?php if (!\App\Models\Auth::isLogged()) { ?>
+                    <li class="nav-item">
+                        <a class="nav-link" href="?c=auth&a=loginForm">Prihlásenie</a>
+                    </li>
                 <?php } else { ?>
-                <li class="nav-item">
-                    <a class="nav-link" href="?c=home&a=addNewActuality">Pridať novú aktualitu</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="?c=home&a=contact">Odhlásenie</a>
-                </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="?c=home&a=addNewActuality">Pridať novú aktualitu</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="?c=auth&a=logout">Odhlásenie</a>
+                    </li>
                 <?php } ?>
             </ul>
         </div>
