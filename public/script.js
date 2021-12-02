@@ -30,32 +30,6 @@ function checkPassword() {
         setInputNG(loginPassInput);
     }
 }
-function checkPassword2() {
-    let passwd = document.getElementById("loginPassInput").value;
-    let passwdAgain = document.getElementById("loginPassAgainInput").value;
-
-
-    if (passwd.length >= 8) {
-        loginPassInput.style.backgroundColor = passwdOK;
-        loginPassInput.classList.remove('is-invalid');
-        loginPassInput.classList.add('is-valid')
-        if (passwd === passwdAgain) {
-            loginPassAgainInput.style.backgroundColor = passwdOK;
-            loginPassAgainInput.classList.remove('is-invalid');
-            loginPassAgainInput.classList.add('is-valid');
-            return true;
-        } else {
-            loginPassAgainInput.style.backgroundColor = passwdNG;
-            loginPassAgainInput.classList.remove('is-valid');
-            loginPassAgainInput.classList.add('is-invalid');
-            return false;
-        }
-    } else {
-        loginPassInput.style.backgroundColor = passwdNG;
-        loginPassInput.classList.remove('is-valid');
-        loginPassInput.classList.add('is-invalid');
-    }
-}
 
 function emptyPass() {
     if (document.getElementById("loginPassInput").value.length > 0) {
