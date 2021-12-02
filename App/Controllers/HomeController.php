@@ -7,6 +7,7 @@ use App\Core\AControllerBase;
 use App\Core\DB\Connection;
 use App\Core\Responses\ViewResponse;
 use App\Models\Aktualita;
+use App\Models\Auth;
 
 /**
  * Class HomeController
@@ -36,7 +37,10 @@ class HomeController extends AControllerBase
     /** Funkcia (podstránka "Pridať novú aktualitu"), ktorá slúži pre pridanie novej aktuality. */
     public function addNewActuality(): ViewResponse
     {
-        return $this->html([]);
+        if (Auth::isLogged())
+            return $this->html([]);
+        else
+            $this->redirectToHome();
     }
 
     /** Funkcia pre upload súboru */
@@ -56,7 +60,7 @@ class HomeController extends AControllerBase
     {
         $postId = $this->request()->getValue('postid'); // Najskôr hľadá kľúč v poli "_POST", potom v poli "_GET" a ak ho nenájde, vráti NULL.
 
-        if ($postId) {                          // Ak sme post našli
+        if ($postId && Auth::isLogged()) {                          // Ak sme post našli
             try {
                 $actuality = Aktualita::getOne($postId);
                 $actuality->delete();
@@ -73,20 +77,22 @@ class HomeController extends AControllerBase
     /** Funkcia pre úpravu aktuality */
     public function editActuality()
     {
-        $postId = $this->request()->getValue('postid'); // Najskôr hľadá kľúč v poli "_POST", potom v poli "_GET" a ak ho nenájde, vráti NULL.
-        $title = $this->request()->getValue('title');
-        if ($postId) {                          // Ak sme post našli
-            try {
-                $actuality = Aktualita::getOne($postId);                                           // Vytiahnem si záznam s daným "$postId" z DB
-                return $this->html([
-                    'titulok' => $actuality->title,
-                    'textClanku' => $actuality->text,
-                    'postid' => $postId
-                ]);
-            } catch (\Exception $e) {               // V prípade výnimky (neplatné ID) redirectni
-                $this->redirectToHome();
+        if (Auth::isLogged()) {
+            $postId = $this->request()->getValue('postid'); // Najskôr hľadá kľúč v poli "_POST", potom v poli "_GET" a ak ho nenájde, vráti NULL.
+            $title = $this->request()->getValue('title');
+            if ($postId) {                          // Ak sme post našli
+                try {
+                    $actuality = Aktualita::getOne($postId);                                           // Vytiahnem si záznam s daným "$postId" z DB
+                    return $this->html([
+                        'titulok' => $actuality->title,
+                        'textClanku' => $actuality->text,
+                        'postid' => $postId
+                    ]);
+                } catch (\Exception $e) {               // V prípade výnimky (neplatné ID) redirectni
+                    $this->redirectToHome();
+                }
             }
-        }
+        } else $this->redirectToHome();
     }
 
     public function editActualityPostBack()
