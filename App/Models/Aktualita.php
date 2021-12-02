@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Core\DB\Connection;
 use App\Core\Model;
 
 class Aktualita extends Model

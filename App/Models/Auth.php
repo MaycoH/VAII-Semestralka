@@ -53,7 +53,9 @@ class Auth extends Model
     {
         if(Auth::getAll("name = ? AND password = ?", [$name, $password])) {
             $_SESSION['name'] = $name;
+            return true;
         }
+        return false;
     }
 
     /** Funkcia pre odhlásenie */
@@ -71,7 +73,7 @@ class Auth extends Model
     }
 
     /** Funkcia, ktorá vráti meno aktuálne prihláseného používateľa
-     * @return mixed|string meno zo session ak je používateľ prihlásený, ináč vráti "Neprihlásený" */
+     * @return mixed|string Meno zo session ak je používateľ prihlásený, ináč vráti "Neprihlásený" */
     public static function getLoggedName()
     {
 //        return ($this->isLogged() ? $_SESSION['name'] : "Neprihlásený");    // Ak je používateľ prihlásený, vráti jeho meno zo session, ináč vráti "Neprihlásený"
