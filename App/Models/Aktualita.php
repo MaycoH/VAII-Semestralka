@@ -9,13 +9,14 @@ class Aktualita extends Model
     public $id;
     public $title;
     public $imagePath;
+    public $perex;
     public $text;
 
 
     /** Vracia zoznam columnov, ktoré sú v DB (ktoré stĺpce sa budú z databázy mapovať do modelu) */
     static public function setDbColumns()
     {
-        return ['id', 'title', 'imagePath', 'text'];
+        return ['id', 'title', 'imagePath', 'perex', 'text'];
     }
 
     /** Vracia názov tabuľky, v ktorej sa dáta nachádzajú */

@@ -4,10 +4,11 @@ namespace App\Controllers;
 
 use App\Config\Configuration;
 use App\Core\AControllerBase;
-use App\Core\DB\Connection;
 use App\Core\Responses\ViewResponse;
 use App\Models\Aktualita;
 use App\Models\Auth;
+
+// TODO: Ošetrenie neplatných hodnôt
 
 /**
  * Class HomeController
@@ -34,7 +35,16 @@ class HomeController extends AControllerBase
         return $this->html([]);
     }
 
-    /** Funkcia (podstránka "Pridať novú aktualitu"), ktorá slúži pre pridanie novej aktuality. */
+    /** Funkcia, ktorá slúži pre vykreslenie aktuality vo view „viewActuality“ po kliknutí na tlačidlo „Zobraziť viac“ v zozname aktualít */
+    public function viewActuality(): ViewResponse
+    {
+        // TODO: Vytvoriť viewActuality
+
+        $postId = $this->request()->getValue('postid'); // Najskôr hľadá kľúč v poli "_POST", potom v poli "_GET" a ak ho nenájde, vráti NULL.
+        return $this->html([Aktualita::getOne($postId)]);
+    }
+
+    /** Funkcia (podstránka „Pridať novú aktualitu“), ktorá slúži pre pridanie novej aktuality. */
     public function addNewActuality(): ViewResponse
     {
         if (Auth::isLogged())
@@ -97,20 +107,24 @@ class HomeController extends AControllerBase
 
     public function editActualityPostBack()
     {//TODO: Ošetriť zmenu obrázku
+    // TODO: Doriešiť zmenu dát - NEDOKONČENÉ
         $postId = $this->request()->getValue('postid'); // Najskôr hľadá kľúč v poli "_POST", potom v poli "_GET" a ak ho nenájde, vráti NULL.
         $newTitle = $this->request()->getValue('titulok');
         $newImage = $this->moveUploadedFile("subor");
         $newText = $this->request()->getValue('textClanku');
 
+
         if ($postId) {                                      // Ak sme post našli
             $actuality = Aktualita::getOne($postId);        // Vytiahnem si záznam s daným "$postId" z DB
-            Connection::connect()->prepare("UPDATE actuality SET title = ?, imagePath = ?, text = ? WHERE id = ?")    // Pomocou "connect()" si vyžiadam spojenie a preparenem si SQL
-                ->execute([$newTitle ? $newTitle : $actuality->title, $newImage ? $newImage : $actuality->imagePath, $newText ? $newText : $actuality->text, intval($postId)]);    // Spustím ho
+            $actuality->title = $newTitle;
+            $actuality->save();
+//            Connection::connect()->prepare("UPDATE actuality SET title = ?, imagePath = ?, text = ? WHERE id = ?")    // Pomocou "connect()" si vyžiadam spojenie a preparenem si SQL
+//                ->execute([$newTitle ? $newTitle : $actuality->title, $newImage ? $newImage : $actuality->imagePath, $newText ? $newText : $actuality->text, intval($postId)]);    // Spustím ho
         }
         $this->redirectToHome();    // Presmerujeme
     }
 
-    public function goNext()
+    public function goNext(): ViewResponse
     {
         $offset = $this->request()->getValue('offset'); // Najskôr hľadá kľúč v poli "_POST", potom v poli "_GET" a ak ho nenájde, vráti NULL.
         unset($_GET["a"]);
