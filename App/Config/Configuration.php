@@ -18,10 +18,15 @@ class Configuration
 
     public const ROOT_LAYOUT = 'root.layout.view.php';
 
-    public const DEBUG_QUERY = false;
+    public const DEBUG_QUERY = true;
 
     public const UPLOAD_DIR = "public/files";
-    public const IMAGES_DIR = "public/images";
+
+    /** @var string Konštanta určujúca root adresár projektu */
     public const ROOT_DIR = "Semestralka";
+    /** @var string Konštanta určujúca podadresár s obrázkami projektu */
+    public const IMAGES_DIR = "public/images";
+//    public const IMAGES_DIR = Configuration::ROOT_DIR."public/images";
+    /** @var int Konštanta určujúca počet aktualít na stránke */
     public const POCET_CLANKOV = 3;
 }

@@ -12,7 +12,7 @@ use App\Models\Auth; ?>
                 <div class="row g-0">
                     <div class="col-md-4">
                         <a href="?c=home&a=vriewActuality&postid=<?= $aktualita->id ?>">
-                            <img src="<?= Configuration::ROOT_DIR."/". Configuration::IMAGES_DIR."/$aktualita->imagePath" ?>" class="img-responsive" alt="<?= $aktualita->perex ?>" >
+                            <img src="<?= Configuration::ROOT_DIR."/". Configuration::IMAGES_DIR."/$aktualita->imagePath" ?>" class="img-responsive" alt="<?= $aktualita->title ?>" >
                         </a>
                     </div>
                     <div class="col-md-8">
@@ -22,17 +22,22 @@ use App\Models\Auth; ?>
                         <div class="col col-11">
                         <?php } else { ?>
                             <div class="col col-12">
-                                <?php } ?>
+                        <?php } ?>
                             <a href="?c=home&a=viewActuality&postid=<?= $aktualita->id ?>">
                                 <h4 class="card-title"><?= $aktualita->title ?></h4>
                             </a>
+                            <div class="Author">Autor: <?= $aktualita->author_id ?> </div>
                             <div class="perex"> <?= $aktualita->perex ?> </div>
                         </div>
-                        <?php if (Auth::isLogged()) { ?>
+                        <?php if (Auth::isLogged() ) { ?>
                             <div class="col col-1 text-end">
-                            <a href="?c=home&a=editActuality&postid=<?= $aktualita->id ?>" class="btn btn-warning"> <i class="bi bi-pencil"></i></a>
-                            <a href="?c=home&a=removeActuality&postid=<?= $aktualita->id ?>" class="btn btn-danger"> <i class="bi bi-trash"></i></a>
-                        </div>
+                                <?php if (Auth::getRole() == 'Admin' || Auth::getRole() == 'Moderator') { ?>
+                                <a href="?c=home&a=editActuality&postid=<?= $aktualita->id ?>" class="btn btn-warning"> <i class="bi bi-pencil"></i></a>
+                                <?php } ?>
+                                <?php if (Auth::getRole() == 'Admin') { ?>
+                                <a href="?c=home&a=removeActuality&postid=<?= $aktualita->id ?>" class="btn btn-danger"> <i class="bi bi-trash"></i></a>
+                                <?php } ?>
+                            </div>
                         <?php } ?>
                     </div>
                 </div>

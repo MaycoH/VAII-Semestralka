@@ -60,6 +60,9 @@ if (isset($_GET["c"])) {            // Ak je zvolený Controller
                         <a class="nav-link <?= $stranka == "Pridať novú aktualitu" ? print("active") : "" ?> " href="?c=home&a=addNewActuality">Pridať novú aktualitu</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link <?php $stranka == "Registrácia" ? print("active") : "" ?>" href="?c=auth&a=changePassForm">Zmena hesla</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="?c=auth&a=logout">Odhlásenie</a>
                     </li>
                 <?php } ?>

@@ -30,6 +30,11 @@ class AuthController extends AControllerBase
         return $this->html([]);
     }
 
+    public function changePassForm()
+    {
+        return$this->html();
+    }
+
     /** Funkcia slúžiaca pre registráciu užívateľa. Ak užívateľ zadal platné údaje a užívateľ so zadaným menom ešte nie je registrovaný,
      * zaregistruje ho, ináč redirect na úvodnú stránku.      */
     public function register()
@@ -70,6 +75,23 @@ class AuthController extends AControllerBase
             $_SESSION["namePassEmpty"] = true;
         }
         header("Location: ?c=auth&a=loginForm");    // Namiesto renderovania presmerujeme.
+    }
+
+    public function changePassword()
+    {
+        $login =  $this->request()->getValue("login");
+        $oldPassword = $this->request()->getValue("oldPassword");               // Najskôr zistím, či je heslo vôbec odoslané
+        $newPassword = $this->request()->getValue("password");               // Najskôr zistím, či je heslo vôbec odoslané
+        $newPasswordAgain = $this->request()->getValue("passwordAgain");     // Najskôr zistím, či je heslo vôbec odoslané
+        if (!empty($login) && !empty($oldPassword) && !empty($newPassword) && !empty($newPasswordAgain)) {      // Skontrolujeme, či sú všetky polia vyplnené
+            if ($newPassword >= 8 && ($newPassword === $newPasswordAgain) && ($oldPassword !== ($newPassword || $newPasswordAgain))) {  // Skontrolujeme, či heslo spĺňa dĺžku a či nové heslá sú rovnaké
+                if (Auth::isRegistered($login)) {
+                    Auth::changePassword($login, $oldPassword, $newPassword);
+                }
+
+            }
+        }
+        $this->redirectToHome();
     }
 
     /** Funkcia pre odhlásenie užívateľa */

@@ -8,6 +8,10 @@
                     <input name="titulok" type="text" id="nazovClanku" class="form-control" value="<?= $data['titulok'] ?>">
                 </div>
                 <div class="mb-3">
+                    <label for="perex" class="form-label">Perex</label>
+                    <input name="perex" type="text" id="perex" class="form-control" value="<?= $data['perex'] ?>">
+                </div>
+                <div class="mb-3">
                     <label for="titulnyObrazokClanku" class="form-label">Titulný obrázok článku</label>
                     <input name="subor" class="form-control" id="titulnyObrazokClanku" type="file">                     <!-- form-control-sm -->
                 </div>

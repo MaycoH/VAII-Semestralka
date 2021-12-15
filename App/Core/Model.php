@@ -81,6 +81,42 @@ abstract class Model implements \JsonSerializable
     }
 
     /**
+     * Return an array of models from DB
+     * @param string $anotherTable Joined table
+     * @param string $joinClause Clause defining linked columns
+     * @param string $columns Columns returned by function from DB
+     * @param string $whereClause Additional where Statement
+     * @param array $whereParams Parameters for where
+     * @return static[]
+     * @throws \Exception
+     */
+    static public function getAllJoin(string $anotherTable = '', string $joinClause = '', string $columns = '', string $whereClause = '', array $whereParams = [])
+    {
+        self::connect();
+        try {
+            $sql = "SELECT " . $columns . " FROM " . self::getTableName() . ($anotherTable=='' ? '' : " LEFT JOIN $anotherTable ON $joinClause") . ($whereClause=='' ? '' : " WHERE $whereClause");
+
+            $stmt = self::$connection->prepare($sql);
+            $exec = $stmt->execute($whereParams);
+
+            $dbModels = $stmt->fetchAll();
+            $models = [];
+            foreach ($dbModels as $model) {
+                $tmpModel = new static();
+                $data = array_fill_keys(self::getDbColumns(), null);
+                foreach ($data as $key => $item) {
+                    $tmpModel->$key = $model[$key];
+                }
+                $models[] = $tmpModel;
+            }
+            return $models;
+        } catch (PDOException $e) {
+            throw new \Exception('Query failed: ' . $e->getMessage());
+        }
+    }
+
+
+    /**
      * Gets one model by primary key
      * @param $id
      * @throws \Exception

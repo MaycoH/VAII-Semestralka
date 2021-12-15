@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Config\Configuration;
 use App\Core\AControllerBase;
+use App\Core\DB\Connection;
 use App\Core\Responses\ViewResponse;
 use App\Models\Aktualita;
 use App\Models\Auth;
@@ -22,7 +23,8 @@ class HomeController extends AControllerBase
     {
 //        $aktualita = Aktualita::getAll();
         $num = Configuration::POCET_CLANKOV;
-        $aktualita = Aktualita::getAll( "id > 0 ORDER BY id desc LIMIT $num");
+//        $aktualita = Aktualita::getAll( "id > 0 ORDER BY id desc LIMIT $num");
+        $aktualita = Aktualita::getAllJoin('users', "author_id=users.id", 'actuality.*, users.name AS author_id', "actuality.id > 0 ORDER BY id desc LIMIT $num");
         return $this->html($aktualita);
     }
 
@@ -57,9 +59,11 @@ class HomeController extends AControllerBase
     public function upload()
     {   // TODO: Ošetriť prázdny titulok a text
         $newActuality = new Aktualita();
-        $newActuality->imagePath = $this->moveUploadedFile("subor");
         $newActuality->title = $this->request()->getValue('titulok');
+        $newActuality->perex = $this->request()->getValue('perex');
+        $newActuality->imagePath = $this->moveUploadedFile("subor");
         $newActuality->text = $this->request()->getValue('textClanku');
+        $newActuality->author_id =  $_SESSION['userId'];
         $newActuality->save();
 
         $this->redirectToHome();    // Presmerujeme
@@ -84,10 +88,10 @@ class HomeController extends AControllerBase
         $this->redirectToHome();    // Presmerujeme
     }
 
-    /** Funkcia pre úpravu aktuality */
+    /** Funkcia pre úpravu aktuality - Funkcia pre predvyplnenie formulára */
     public function editActuality()
     {
-        if (Auth::isLogged()) {
+        if (Auth::isLogged() && (Auth::getRole() == 'Moderator' || Auth::getRole() == 'Admin')) {
             $postId = $this->request()->getValue('postid'); // Najskôr hľadá kľúč v poli "_POST", potom v poli "_GET" a ak ho nenájde, vráti NULL.
             $title = $this->request()->getValue('title');
             if ($postId) {                          // Ak sme post našli
@@ -95,6 +99,7 @@ class HomeController extends AControllerBase
                     $actuality = Aktualita::getOne($postId);                                           // Vytiahnem si záznam s daným "$postId" z DB
                     return $this->html([
                         'titulok' => $actuality->title,
+                        'perex' => $actuality->perex,
                         'textClanku' => $actuality->text,
                         'postid' => $postId
                     ]);
@@ -107,16 +112,18 @@ class HomeController extends AControllerBase
 
     public function editActualityPostBack()
     {//TODO: Ošetriť zmenu obrázku
-    // TODO: Doriešiť zmenu dát - NEDOKONČENÉ
+    // TODO: Doriešiť zmenu dát - DONE
         $postId = $this->request()->getValue('postid'); // Najskôr hľadá kľúč v poli "_POST", potom v poli "_GET" a ak ho nenájde, vráti NULL.
         $newTitle = $this->request()->getValue('titulok');
+        $newPerex = $this->request()->getValue('perex');
         $newImage = $this->moveUploadedFile("subor");
         $newText = $this->request()->getValue('textClanku');
-
 
         if ($postId) {                                      // Ak sme post našli
             $actuality = Aktualita::getOne($postId);        // Vytiahnem si záznam s daným "$postId" z DB
             $actuality->title = $newTitle;
+            $actuality->perex = $newPerex;
+            $actuality->text = $newText;
             $actuality->save();
 //            Connection::connect()->prepare("UPDATE actuality SET title = ?, imagePath = ?, text = ? WHERE id = ?")    // Pomocou "connect()" si vyžiadam spojenie a preparenem si SQL
 //                ->execute([$newTitle ? $newTitle : $actuality->title, $newImage ? $newImage : $actuality->imagePath, $newText ? $newText : $actuality->text, intval($postId)]);    // Spustím ho
@@ -129,7 +136,7 @@ class HomeController extends AControllerBase
         $offset = $this->request()->getValue('offset'); // Najskôr hľadá kľúč v poli "_POST", potom v poli "_GET" a ak ho nenájde, vráti NULL.
         unset($_GET["a"]);
         $num = Configuration::POCET_CLANKOV;
-        $aktualita = Aktualita::getAll( "id > 0 ORDER BY id desc LIMIT $num OFFSET $offset");
+        $aktualita = Aktualita::getAll( "id > 0 ORDER BY id desc LIMIT ? OFFSET $offset");
         return $this->html($aktualita);
     }
 

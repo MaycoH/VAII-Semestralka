@@ -17,9 +17,9 @@ use App\Models\Auth; ?>
                                 <a href="?c=home&a=removeActuality&postid=<?= $aktualita->id ?>" class="btn btn-danger"> <i class="bi bi-trash"></i></a>
                             </div>
                         <?php } ?>
+                        <h5 id="perex"> <?= $aktualita->perex ?> </h5>
                     </div>
                     <img src="<?= Configuration::ROOT_DIR."/". Configuration::IMAGES_DIR."/$aktualita->imagePath" ?>" class="img-responsive" alt="..." >
-                    <div class="perex"> <?= $aktualita->perex ?> </div>
                     <p class="card-text"> <?= $aktualita->text ?> </p>
                 </div>
             </div>
