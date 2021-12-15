@@ -72,6 +72,7 @@ class Auth extends Model
     /** Funkcia slúžiaca pre zmazanie užívateľa.
      * @param $password - Heslo pre overenie užívateľa
      * @return bool true, ak zmazanie užívateľa prebehlo úspešne, ináč false
+     * @throws \Exception
      */
     public static function deleteAccount ($password): bool
     {

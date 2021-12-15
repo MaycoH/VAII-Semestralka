@@ -109,10 +109,14 @@ class AuthController extends AControllerBase
     {
         $password = $this->request()->getValue("password");     // Najskôr zistím, či je heslo vôbec odoslané
         if (!empty($password)) {                                   // Ak bolo meno a heslo zadané
-            if (Auth::deleteAccount($password)) {                    // Urobíme prihlásenie
-                return $this->html(['status' => "passwordOK"],'deleteAccountForm');
-            } else {
-                return $this->html(['status' => "passwordWrong"],'deleteAccountForm');
+            try {
+                if (Auth::deleteAccount($password)) {                    // Urobíme prihlásenie
+                    return $this->html(['status' => "passwordOK"], 'deleteAccountForm');
+                } else {
+                    return $this->html(['status' => "passwordWrong"], 'deleteAccountForm');
+                }
+            } catch (\Exception $e) {
+                $this->redirectToHome();
             }
         } else {
             return $this->html(['status' => "passwordWrong"],'deleteAccountForm');
