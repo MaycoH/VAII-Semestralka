@@ -136,13 +136,15 @@ class HomeController extends AControllerBase
         if ($postId) {                                      // Ak sme post našli
             $actuality = Aktualita::getOne($postId);        // Vytiahnem si záznam s daným "$postId" z DB
             if (strlen($newTitle) > 5 && strlen($newPerex) > 5 && strlen($newText) > 5) {
-                $actuality->title = $newTitle ? $newTitle : $actuality->title;
-                $actuality->perex = $newPerex;
-                $actuality->imagePath = $newImage ? $newImage : $actuality->imagePath;
-                $actuality->text = $newText;
-                $actuality->save();
+                if (strlen($newTitle) < 255 && strlen($newPerex) < 255) {
+                    $actuality->title = $newTitle;
+                    $actuality->perex = $newPerex;
+                    $actuality->imagePath = $newImage ? $newImage : $actuality->imagePath;
+                    $actuality->text = $newText;
+                    $actuality->save();
 //            Connection::connect()->prepare("UPDATE actuality SET title = ?, imagePath = ?, text = ? WHERE id = ?")    // Pomocou "connect()" si vyžiadam spojenie a preparenem si SQL
 //                ->execute([$newTitle ? $newTitle : $actuality->title, $newImage ? $newImage : $actuality->imagePath, $newText ? $newText : $actuality->text, intval($postId)]);    // Spustím ho
+                }
             } else {
                 return $this->html([
                     'titulok' => $actuality->title,

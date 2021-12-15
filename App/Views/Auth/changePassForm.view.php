@@ -1,4 +1,3 @@
-<?php ?>
 <?php /** @var \App\Models\Auth[] $data */ ?>
 <div class="container">
     <div class="row">

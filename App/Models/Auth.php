@@ -45,6 +45,7 @@ class Auth extends Model
         $user = new Auth();
         $user->name = $name;
         $user->password = $hash;
+        $user->role = 'User';
         $user->save();
     }
 
@@ -54,7 +55,8 @@ class Auth extends Model
      * @param $newPassword - Nové heslo používateľa
      * @return bool true, ak bola zmena úspešná, ináč false
      */
-    public static function changePassword ($oldPassword, $newPassword) {
+    public static function changePassword ($oldPassword, $newPassword): bool
+    {
 //        $users = Auth::getAll("name = ?", [$username]);
         $user = Auth::getOne($_SESSION['userId']);
 //        foreach ($users as $user) {
@@ -64,6 +66,23 @@ class Auth extends Model
                 return true;
             }
 //        }
+        return false;
+    }
+
+    /** Funkcia slúžiaca pre zmazanie užívateľa.
+     * @param $password - Heslo pre overenie užívateľa
+     * @return bool true, ak zmazanie užívateľa prebehlo úspešne, ináč false
+     */
+    public static function deleteAccount ($password): bool
+    {
+        $user = Auth::getOne($_SESSION['userId']);
+        if (password_verify($password, $user->password)) {
+            if (Auth::isLogged()) {
+                self::logout();
+            }
+            $user->delete();
+            return true;
+        }
         return false;
     }
 

@@ -34,6 +34,10 @@ class AuthController extends AControllerBase
     {
         return$this->html();
     }
+    public function deleteAccountForm()
+    {
+        return$this->html();
+    }
 
     /** Funkcia slúžiaca pre registráciu užívateľa. Ak užívateľ zadal platné údaje a užívateľ so zadaným menom ešte nie je registrovaný,
      * zaregistruje ho, ináč redirect na úvodnú stránku.      */
@@ -43,7 +47,7 @@ class AuthController extends AControllerBase
         $password = $this->request()->getValue("password");    // Najskôr zistím, či je heslo vôbec odoslané
         $passwordAgain = $this->request()->getValue("passwordAgain");
         if (!empty($name) && !empty($password) && !empty($passwordAgain)) {
-            if ($password >= 8 && $password < 255 && ($password === $passwordAgain)) {
+            if (strlen($password) >= 8 && strlen($password) < 255 && ($password === $passwordAgain)) {
                 if (!Auth::isRegistered($name)) {           // Ak užívateľ so zadaným menom ešte nie je zaregistrovaný
                     Auth::register($name, $password);       // Urobíme registráciu
                     $_SESSION["alreadyRegistered"] = false;
@@ -83,7 +87,7 @@ class AuthController extends AControllerBase
         $newPassword = $this->request()->getValue("password");               // Najskôr zistím, či je heslo vôbec odoslané
         $newPasswordAgain = $this->request()->getValue("passwordAgain");     // Najskôr zistím, či je heslo vôbec odoslané
         if (!empty($oldPassword) && !empty($newPassword) && !empty($newPasswordAgain)) {      // Skontrolujeme, či sú všetky polia vyplnené
-            if ($newPassword >= 8 && $newPassword < 255 && ($newPassword === $newPasswordAgain)) {  // Skontrolujeme, či heslo spĺňa dĺžku a či nové heslá sú rovnaké
+            if (strlen($newPassword) >= 8 && strlen($newPassword) < 255 && ($newPassword === $newPasswordAgain)) {  // Skontrolujeme, či heslo spĺňa dĺžku a či nové heslá sú rovnaké
                 if ($oldPassword !== $newPassword) {
                     if (Auth::changePassword($oldPassword, $newPassword)) {
                         return $this->html(['status' => "passChangedOK"],'changePassForm');
@@ -101,6 +105,19 @@ class AuthController extends AControllerBase
         }
     }
 
+    public function deleteAccount()
+    {
+        $password = $this->request()->getValue("password");     // Najskôr zistím, či je heslo vôbec odoslané
+        if (!empty($password)) {                                   // Ak bolo meno a heslo zadané
+            if (Auth::deleteAccount($password)) {                    // Urobíme prihlásenie
+                return $this->html(['status' => "passwordOK"],'deleteAccountForm');
+            } else {
+                return $this->html(['status' => "passwordWrong"],'deleteAccountForm');
+            }
+        } else {
+            return $this->html(['status' => "passwordWrong"],'deleteAccountForm');
+        }
+    }
     /** Funkcia pre odhlásenie užívateľa */
     public function logout()
     {
