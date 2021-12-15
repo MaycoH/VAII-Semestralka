@@ -49,22 +49,37 @@ class HomeController extends AControllerBase
     /** Funkcia (podstránka „Pridať novú aktualitu“), ktorá slúži pre pridanie novej aktuality. */
     public function addNewActuality(): ViewResponse
     {
-        if (Auth::isLogged())
+        if (Auth::isLogged() && (Auth::getRole() == 'Admin' || Auth::getRole() == 'Moderator'))
             return $this->html([]);
         else
-            $this->redirectToHome();
+            return $this->html([]);
     }
 
     /** Funkcia pre upload súboru */
     public function upload()
     {   // TODO: Ošetriť prázdny titulok a text
-        $newActuality = new Aktualita();
-        $newActuality->title = $this->request()->getValue('titulok');
-        $newActuality->perex = $this->request()->getValue('perex');
-        $newActuality->imagePath = $this->moveUploadedFile("subor");
-        $newActuality->text = $this->request()->getValue('textClanku');
-        $newActuality->author_id =  $_SESSION['userId'];
-        $newActuality->save();
+        $title = $this->request()->getValue('titulok');
+        $perex = $this->request()->getValue('perex');
+        $imagePath = $this->moveUploadedFile("subor");
+        $text = $this->request()->getValue('textClanku');
+        if (strlen($title) > 5 && strlen($perex) > 5 && strlen($text) > 5) {
+            if (strlen($title) < 255 && strlen($perex) < 255) {
+                $newActuality = new Aktualita();
+                $newActuality->title = $this->request()->getValue('titulok');
+                $newActuality->perex = $this->request()->getValue('perex');
+                $newActuality->imagePath = $this->moveUploadedFile("subor");
+                $newActuality->text = $this->request()->getValue('textClanku');
+                $newActuality->author_id = $_SESSION['userId'];
+                $newActuality->save();
+            }
+        } else {
+            return $this->html([
+                'titulok' => $title,
+                'perex' => $perex,
+                'textClanku' => $text,
+                'error' => "wrongData"
+            ],'addNewActuality');
+        }
 
         $this->redirectToHome();    // Presmerujeme
     }
@@ -121,12 +136,23 @@ class HomeController extends AControllerBase
 
         if ($postId) {                                      // Ak sme post našli
             $actuality = Aktualita::getOne($postId);        // Vytiahnem si záznam s daným "$postId" z DB
-            $actuality->title = $newTitle;
-            $actuality->perex = $newPerex;
-            $actuality->text = $newText;
-            $actuality->save();
+            if (strlen($newTitle) > 5 && strlen($newPerex) > 5 && strlen($newText) > 5) {
+                $actuality->title = $newTitle ? $newTitle : $actuality->title;
+                $actuality->perex = $newPerex;
+                $actuality->imagePath = $newImage ? $newImage : $actuality->imagePath;
+                $actuality->text = $newText;
+                $actuality->save();
 //            Connection::connect()->prepare("UPDATE actuality SET title = ?, imagePath = ?, text = ? WHERE id = ?")    // Pomocou "connect()" si vyžiadam spojenie a preparenem si SQL
 //                ->execute([$newTitle ? $newTitle : $actuality->title, $newImage ? $newImage : $actuality->imagePath, $newText ? $newText : $actuality->text, intval($postId)]);    // Spustím ho
+            } else {
+                return $this->html([
+                    'titulok' => $actuality->title,
+                    'perex' => $actuality->perex,
+                    'textClanku' => $actuality->text,
+                    'postid' => $postId,
+                    'error' => "wrongData"
+                ],'editActuality');
+            }
         }
         $this->redirectToHome();    // Presmerujeme
     }
@@ -153,14 +179,18 @@ class HomeController extends AControllerBase
     private function moveUploadedFile($inputName): ?string
     {
         if (isset($_FILES[$inputName])) {
-            if ($_FILES["$inputName"]["error"] == UPLOAD_ERR_OK) {
-                $tmp_name = $_FILES["$inputName"]["tmp_name"];
+            $ext = strtolower(pathinfo($_FILES[$inputName]['name'], PATHINFO_EXTENSION));
+            $fileType = $_FILES[$inputName]["type"];
+            if (($ext === 'jpg' || $ext === 'jpeg') && $fileType === "image/jpeg") {
+                if ($_FILES["$inputName"]["error"] == UPLOAD_ERR_OK) {
+                    $tmp_name = $_FILES["$inputName"]["tmp_name"];
 
-                $name = time() . "_" . $_FILES["$inputName"]["name"];
-                $path = Configuration::IMAGES_DIR . "/$name";
+                    $name = time() . "_" . $_FILES["$inputName"]["name"];
+                    $path = Configuration::IMAGES_DIR . "/$name";
 
-                move_uploaded_file($tmp_name, $path);
-                return $name;
+                    move_uploaded_file($tmp_name, $path);
+                    return $name;
+                }
             }
         }
         return null;

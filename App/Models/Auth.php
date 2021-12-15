@@ -54,15 +54,16 @@ class Auth extends Model
      * @param $newPassword - Nové heslo používateľa
      * @return bool true, ak bola zmena úspešná, ináč false
      */
-    public static function changePassword ($username, $oldPassword, $newPassword) {
-        $users = Auth::getAll("name = ?", [$username]);
-        foreach ($users as $user) {
+    public static function changePassword ($oldPassword, $newPassword) {
+//        $users = Auth::getAll("name = ?", [$username]);
+        $user = Auth::getOne($_SESSION['userId']);
+//        foreach ($users as $user) {
             if (password_verify($oldPassword, $user->password)) {
                 $user->password = password_hash($newPassword, PASSWORD_DEFAULT);
                 $user->save();
                 return true;
             }
-        }
+//        }
         return false;
     }
 

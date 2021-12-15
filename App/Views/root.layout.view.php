@@ -15,6 +15,8 @@ if (isset($_GET["c"])) {            // Ak je zvolený Controller
             $stranka = "Prihlásenie";
         if($_GET["c"] == "auth" && $_GET["a"] == "registerForm")
             $stranka = "Registrácia";
+        if($_GET["c"] == "auth" && $_GET["a"] == "changePassForm")
+            $stranka = "Zmena hesla";
     }
 }
 ?>
@@ -35,7 +37,7 @@ if (isset($_GET["c"])) {            // Ak je zvolený Controller
 <body>
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark justify-content-end">
     <div class="container">
-        <a class="navbar-brand" href="#">Covid informácie  - <?= $stranka ?></a>
+        <a class="navbar-brand" href="#">Covid informácie - <?= $stranka ?></a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -57,10 +59,10 @@ if (isset($_GET["c"])) {            // Ak je zvolený Controller
                     </li>
                 <?php } else { ?>
                     <li class="nav-item">
-                        <a class="nav-link <?= $stranka == "Pridať novú aktualitu" ? print("active") : "" ?> " href="?c=home&a=addNewActuality">Pridať novú aktualitu</a>
+                        <a class="nav-link <?php $stranka == "Pridať novú aktualitu" ? print("active") : "" ?> " href="?c=home&a=addNewActuality">Pridať novú aktualitu</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link <?php $stranka == "Registrácia" ? print("active") : "" ?>" href="?c=auth&a=changePassForm">Zmena hesla</a>
+                        <a class="nav-link <?php $stranka == "Zmena hesla" ? print("active") : "" ?>" href="?c=auth&a=changePassForm">Zmena hesla</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="?c=auth&a=logout">Odhlásenie</a>

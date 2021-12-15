@@ -43,7 +43,7 @@ class AuthController extends AControllerBase
         $password = $this->request()->getValue("password");    // Najskôr zistím, či je heslo vôbec odoslané
         $passwordAgain = $this->request()->getValue("passwordAgain");
         if (!empty($name) && !empty($password) && !empty($passwordAgain)) {
-            if ($password >= 8 && ($password === $passwordAgain)) {
+            if ($password >= 8 && $password < 255 && ($password === $passwordAgain)) {
                 if (!Auth::isRegistered($name)) {           // Ak užívateľ so zadaným menom ešte nie je zaregistrovaný
                     Auth::register($name, $password);       // Urobíme registráciu
                     $_SESSION["alreadyRegistered"] = false;
@@ -79,25 +79,34 @@ class AuthController extends AControllerBase
 
     public function changePassword()
     {
-        $login =  $this->request()->getValue("login");
         $oldPassword = $this->request()->getValue("oldPassword");               // Najskôr zistím, či je heslo vôbec odoslané
         $newPassword = $this->request()->getValue("password");               // Najskôr zistím, či je heslo vôbec odoslané
         $newPasswordAgain = $this->request()->getValue("passwordAgain");     // Najskôr zistím, či je heslo vôbec odoslané
-        if (!empty($login) && !empty($oldPassword) && !empty($newPassword) && !empty($newPasswordAgain)) {      // Skontrolujeme, či sú všetky polia vyplnené
-            if ($newPassword >= 8 && ($newPassword === $newPasswordAgain) && ($oldPassword !== ($newPassword || $newPasswordAgain))) {  // Skontrolujeme, či heslo spĺňa dĺžku a či nové heslá sú rovnaké
-                if (Auth::isRegistered($login)) {
-                    Auth::changePassword($login, $oldPassword, $newPassword);
+        if (!empty($oldPassword) && !empty($newPassword) && !empty($newPasswordAgain)) {      // Skontrolujeme, či sú všetky polia vyplnené
+            if ($newPassword >= 8 && $newPassword < 255 && ($newPassword === $newPasswordAgain)) {  // Skontrolujeme, či heslo spĺňa dĺžku a či nové heslá sú rovnaké
+                if ($oldPassword !== $newPassword) {
+                    if (Auth::changePassword($oldPassword, $newPassword)) {
+                        return $this->html(['status' => "passChangedOK"],'changePassForm');
+                    } else {
+                        return $this->html(['status' => "oldPassWrong"],'changePassForm');
+                    }
+                } else {
+                    return $this->html(['status' => "newPassSameAsOld"],'changePassForm');
                 }
-
+            } else {
+                return $this->html(['status' => "newPasswordsNotSame"],'changePassForm');
             }
+        } else {
+            return $this->html(['status' => "passEmpty"],'changePassForm');
         }
-        $this->redirectToHome();
     }
 
     /** Funkcia pre odhlásenie užívateľa */
     public function logout()
     {
-        Auth::logout();
+        if (Auth::isLogged()) {
+            Auth::logout();
+        }
         $this->redirectToHome();
     }
 
