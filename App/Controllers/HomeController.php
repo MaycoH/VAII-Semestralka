@@ -80,7 +80,6 @@ class HomeController extends AControllerBase
                 'error' => "wrongData"
             ],'addNewActuality');
         }
-
         $this->redirectToHome();    // Presmerujeme
     }
 
@@ -89,7 +88,7 @@ class HomeController extends AControllerBase
     {
         $postId = $this->request()->getValue('postid'); // Najskôr hľadá kľúč v poli "_POST", potom v poli "_GET" a ak ho nenájde, vráti NULL.
 
-        if ($postId && Auth::isLogged()) {                          // Ak sme post našli
+        if ($postId && Auth::isLogged() && Auth::getRole() == "Admin") {                          // Ak sme post našli
             try {
                 $actuality = Aktualita::getOne($postId);
                 $actuality->delete();
