@@ -20,7 +20,7 @@
                 ?>
                     <input type="submit" value="Zmazať účet">
                     <input type="reset" value="Zmazať formulár">
-                    <input type="button" value="Vrátiť sa" onclick="history.back()">
+                    <input type="button" value="Vrátiť sa" onclick="redirectToHome()">
             </form>
         </div>
     </div>

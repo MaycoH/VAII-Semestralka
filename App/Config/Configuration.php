@@ -29,4 +29,6 @@ class Configuration
 //    public const IMAGES_DIR = Configuration::ROOT_DIR."public/images";
     /** @var int Konštanta určujúca počet aktualít na stránke */
     public const POCET_CLANKOV = 3;
+
+    public const ALLOWED_TAGS = '<p><b><strong><br><i><em><small><sub><sup><del><ins><mark>';
 }

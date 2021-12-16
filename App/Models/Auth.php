@@ -37,8 +37,9 @@ class Auth extends Model
     /** Funkcia slúžiaca na zaregistrovanie nového užívateľa (a jeho zápis do DB)
      * @param $name - Meno užívateľa
      * @param $password - Heslo užívateľa
+     * @return bool True, ak registrácia bola úspešná, ináč false
      */
-    public static function register($name, $password)
+    public static function register($name, $password): bool
     {
         $hash = password_hash($password, PASSWORD_DEFAULT);
 
@@ -46,23 +47,35 @@ class Auth extends Model
         $user->name = $name;
         $user->password = $hash;
         $user->role = 'User';
-        $user->save();
+        try {
+            $user->save();
+        } catch (\Exception $e) {
+            return false;
+        }
+        return true;
     }
 
     /** Funkcia slúžiaca pre zmenu hesla užívateľa.
-     * @param $username  - Login používateľa
      * @param $oldPassword - Pôvodné heslo používateľa
      * @param $newPassword - Nové heslo používateľa
-     * @return bool true, ak bola zmena úspešná, ináč false
+     * @return bool True, ak bola zmena úspešná, ináč false
      */
     public static function changePassword ($oldPassword, $newPassword): bool
     {
 //        $users = Auth::getAll("name = ?", [$username]);
-        $user = Auth::getOne($_SESSION['userId']);
+        try {
+            $user = Auth::getOne($_SESSION['userId']);
+        } catch (\Exception $e) {
+            return false;
+        }
 //        foreach ($users as $user) {
             if (password_verify($oldPassword, $user->password)) {
                 $user->password = password_hash($newPassword, PASSWORD_DEFAULT);
-                $user->save();
+                try {
+                    $user->save();
+                } catch (\Exception $e) {
+                    return false;
+                }
                 return true;
             }
 //        }
@@ -71,17 +84,24 @@ class Auth extends Model
 
     /** Funkcia slúžiaca pre zmazanie užívateľa.
      * @param $password - Heslo pre overenie užívateľa
-     * @return bool true, ak zmazanie užívateľa prebehlo úspešne, ináč false
-     * @throws \Exception
+     * @return bool True, ak zmazanie užívateľa prebehlo úspešne, ináč false
      */
     public static function deleteAccount ($password): bool
     {
-        $user = Auth::getOne($_SESSION['userId']);
+        try {
+            $user = Auth::getOne($_SESSION['userId']);
+        } catch (\Exception $e) {
+            return false;
+        }
         if (password_verify($password, $user->password)) {
             if (Auth::isLogged()) {
                 self::logout();
             }
-            $user->delete();
+            try {
+                $user->delete();
+            } catch (\Exception $e) {
+                return false;
+            }
             return true;
         }
         return false;
@@ -90,10 +110,15 @@ class Auth extends Model
     /** Funkcia slúžiaca na prihlásenie užívateľa. Funkcia vyhľadá užívateľa s daným menom a heslom v DB a ak sa zhodujú, prihlási ho.
      * @param $name - Prihlasovacie meno
      * @param $password - Prihlasovacie heslo
+     * @return bool True, ak bolo prihlásenie úspešné, ináč false
      */
     public static function login($name, $password): bool
     {
-        $users = Auth::getAll("name = ?", [$name]);
+        try {
+            $users = Auth::getAll("name = ?", [$name]);
+        } catch (\Exception $e) {
+            return false;
+        }
         foreach ($users as $user) {
             if (password_verify($password, $user->password)) {
                 $_SESSION['userId'] = $user->id;
@@ -106,7 +131,9 @@ class Auth extends Model
     /** Funkcia pre odhlásenie */
     public static function logout()
     {
-        unset($_SESSION['userId']);
+        if (isset($_SESSION['userId'])) {
+            unset($_SESSION['userId']);
+        }
     }
 
     /** Funkcia, ktorá informuje či je používateľ prihlásený
@@ -136,6 +163,10 @@ class Auth extends Model
 //            return $user->role;
 //        }
 //        return null;
-        return Auth::getOne($_SESSION['userId'])->role;
+        try {
+            return Auth::getOne($_SESSION['userId'])->role;
+        } catch (\Exception $e) {
+            return "Guest";
+        }
     }
 }

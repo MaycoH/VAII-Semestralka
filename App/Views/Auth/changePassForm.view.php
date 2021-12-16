@@ -41,7 +41,7 @@
                 ?>
                     <input type="submit" value="Zmeniť heslo">
                     <input type="reset" value="Zmazať">
-                    <input type="button" value="Vrátiť sa" onclick="history.back()">
+                    <input type="button" value="Vrátiť sa" onclick="redirectToHome()">
             </form>
         </div>
     </div>

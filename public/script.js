@@ -50,6 +50,11 @@ function emptyPass(input) {
         return true;
     }
 }
+
+function redirectToHome() {
+    window.location.replace('?c=home');
+}
+
 function setInputOK(input) {
     input.style.backgroundColor = passwdOK;
     input.classList.remove('is-invalid');

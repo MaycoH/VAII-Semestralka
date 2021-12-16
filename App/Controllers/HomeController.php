@@ -58,17 +58,17 @@ class HomeController extends AControllerBase
     /** Funkcia pre upload súboru */
     public function upload()
     {   // TODO: Ošetriť prázdny titulok a text
-        $title = $this->request()->getValue('titulok');
-        $perex = $this->request()->getValue('perex');
+        $title = strip_tags($this->request()->getValue('titulok'), Configuration::ALLOWED_TAGS);
+        $perex = strip_tags($this->request()->getValue('perex'), Configuration::ALLOWED_TAGS);
         $imagePath = $this->moveUploadedFile("subor");
-        $text = $this->request()->getValue('textClanku');
+        $text = strip_tags($this->request()->getValue('textClanku'), Configuration::ALLOWED_TAGS);
         if (strlen($title) > 5 && strlen($perex) > 5 && strlen($text) > 5) {
             if (strlen($title) < 255 && strlen($perex) < 255) {
                 $newActuality = new Aktualita();
-                $newActuality->title = $this->request()->getValue('titulok');
-                $newActuality->perex = $this->request()->getValue('perex');
-                $newActuality->imagePath = $this->moveUploadedFile("subor");
-                $newActuality->text = $this->request()->getValue('textClanku');
+                $newActuality->title = $title;
+                $newActuality->perex = $perex;
+                $newActuality->imagePath = $imagePath;
+                $newActuality->text = $text;
                 $newActuality->author_id = $_SESSION['userId'];
                 $newActuality->save();
             }
@@ -128,10 +128,10 @@ class HomeController extends AControllerBase
     {//TODO: Ošetriť zmenu obrázku
     // TODO: Doriešiť zmenu dát - DONE
         $postId = $this->request()->getValue('postid'); // Najskôr hľadá kľúč v poli "_POST", potom v poli "_GET" a ak ho nenájde, vráti NULL.
-        $newTitle = $this->request()->getValue('titulok');
-        $newPerex = $this->request()->getValue('perex');
+        $newTitle = strip_tags($this->request()->getValue('titulok'), Configuration::ALLOWED_TAGS);
+        $newPerex = strip_tags($this->request()->getValue('perex'), Configuration::ALLOWED_TAGS);
         $newImage = $this->moveUploadedFile("subor");
-        $newText = $this->request()->getValue('textClanku');
+        $newText = strip_tags($this->request()->getValue('textClanku'),Configuration::ALLOWED_TAGS);
 
         if ($postId) {                                      // Ak sme post našli
             $actuality = Aktualita::getOne($postId);        // Vytiahnem si záznam s daným "$postId" z DB
@@ -175,14 +175,14 @@ class HomeController extends AControllerBase
     }
 
     /** Funkcia pre nahratie súboru z inputu na server.
-     * @return string|null
+     * @return string|null Názov súboru v prípade úspešného nahratia súboru, ináč null.
      */
     private function moveUploadedFile($inputName): ?string
     {
         if (isset($_FILES[$inputName])) {
             $ext = strtolower(pathinfo($_FILES[$inputName]['name'], PATHINFO_EXTENSION));
             $fileType = $_FILES[$inputName]["type"];
-            if (($ext === 'jpg' || $ext === 'jpeg') && $fileType === "image/jpeg") {
+            if (($ext === 'jpg' || $ext === 'jpeg') && $fileType === "image/jpeg") {    // Kontrola typu súboru
                 if ($_FILES["$inputName"]["error"] == UPLOAD_ERR_OK) {
                     $tmp_name = $_FILES["$inputName"]["tmp_name"];
 
