@@ -21,7 +21,15 @@ class Configuration
     public const DEBUG_QUERY = false;
 
     public const UPLOAD_DIR = "public/files";
-    public const IMAGES_DIR = "public/images";
+
+    /** @var string Konštanta určujúca root adresár projektu */
     public const ROOT_DIR = "Semestralka";
+    /** @var string Konštanta určujúca podadresár s obrázkami projektu */
+    public const IMAGES_DIR = "public/images";
+//    public const IMAGES_DIR = Configuration::ROOT_DIR."public/images";
+    /** @var int Konštanta určujúca počet aktualít na stránke */
     public const POCET_CLANKOV = 3;
+
+    /** @var string Konštanta určujúca povolené tagy v inputoch */
+    public const ALLOWED_TAGS = '<p><b><strong><br><i><em><small><sub><sup><del><ins><mark>';
 }

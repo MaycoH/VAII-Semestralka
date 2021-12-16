@@ -1,27 +1,49 @@
 <?php /** @var \App\Models\Aktualita[] $data */
-
+// https://getbootstrap.com/docs/5.1/components/card/#horizontal
 use App\Config\Configuration;
 use App\Core\DB\Connection;
 use App\Models\Auth; ?>
 <div class="container">
     <div class="row">
         <div class="col col-md-8">
+
             <?php foreach (($data) as $aktualita) { ?>
-            <div class="card mb-3">   <!-- style="width: 18rem;" -->
+            <div class="card mb-3">   <!-- style="width: 18rem;"   style="max-width: 540px;"   -->
+                <div class="row g-0">
+                    <div class="col-md-4">
+                        <a href="?c=home&a=vriewActuality&postid=<?= $aktualita->id ?>">
+                            <img src="<?= Configuration::ROOT_DIR."/". Configuration::IMAGES_DIR."/$aktualita->imagePath" ?>" class="img-responsive" alt="<?= $aktualita->title ?>" >
+                        </a>
+                    </div>
+                    <div class="col-md-8">
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col col-11"><h1 class="card-title"><?= $aktualita->title ?></h1></div>
+                    <div class="row">       <!-- div pre titulok a tlačidlá -->
                         <?php if (Auth::isLogged()) { ?>
-                            <div class="col col-1 my-auto text-end">
+                        <div class="col col-11">
+                        <?php } else { ?>
+                            <div class="col col-12">
+                        <?php } ?>
+                            <a href="?c=home&a=viewActuality&postid=<?= $aktualita->id ?>">
+                                <h4 class="card-title"><?= $aktualita->title ?></h4>
+                            </a>
+                            <div class="Author">Autor: <?= $aktualita->author_id ?> </div>
+                            <div class="perex"> <?= $aktualita->perex ?> </div>
+                        </div>
+                        <?php if (Auth::isLogged() ) { ?>
+                            <div class="col col-1 text-end">
+                                <?php if (Auth::getRole() == 'Admin' || Auth::getRole() == 'Moderator') { ?>
                                 <a href="?c=home&a=editActuality&postid=<?= $aktualita->id ?>" class="btn btn-warning"> <i class="bi bi-pencil"></i></a>
+                                <?php } ?>
+                                <?php if (Auth::getRole() == 'Admin') { ?>
                                 <a href="?c=home&a=removeActuality&postid=<?= $aktualita->id ?>" class="btn btn-danger"> <i class="bi bi-trash"></i></a>
+                                <?php } ?>
                             </div>
                         <?php } ?>
                     </div>
-                    <img src="<?= Configuration::ROOT_DIR."/". Configuration::IMAGES_DIR."/$aktualita->imagePath" ?>" class="img-responsive" alt="..." >
-                    <p class="card-text"> <?= $aktualita->text ?> </p>
                 </div>
             </div>
+                </div>
+                </div>
             <?php } ?>
             <div class="row" id="bottomButtons">
                 <?php

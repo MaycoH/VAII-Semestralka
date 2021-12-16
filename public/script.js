@@ -13,7 +13,7 @@ function checkLogin() {
     }
 }
 
-function checkPassword() {
+function checkPasswords() {
     let passwd = document.getElementById("loginPassInput").value;
     let passwdAgain = document.getElementById("loginPassAgainInput").value;
 
@@ -31,15 +31,30 @@ function checkPassword() {
     }
 }
 
-function emptyPass() {
-    if (document.getElementById("loginPassInput").value.length > 0) {
-        setInputOK(loginPassInput);
+// function emptyPass2(input) {
+//     if (document.getElementById(input).value.length > 0) {
+//         setInputOK(input);
+//         return false;
+//     } else {
+//         setInputNG(input);
+//         return true;
+//     }
+// }
+function emptyPass(input) {
+    let el = document.getElementById(input);
+    if (el.value.length > 0) {
+        setInputOK(el);
         return false;
     } else {
-        setInputNG(loginPassInput);
+        setInputNG(el);
         return true;
     }
 }
+
+function redirectToHome() {
+    window.location.replace('?c=home');
+}
+
 function setInputOK(input) {
     input.style.backgroundColor = passwdOK;
     input.classList.remove('is-invalid');

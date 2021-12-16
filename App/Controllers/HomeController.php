@@ -9,6 +9,8 @@ use App\Core\Responses\ViewResponse;
 use App\Models\Aktualita;
 use App\Models\Auth;
 
+// TODO: Ošetrenie neplatných hodnôt
+
 /**
  * Class HomeController
  * Example of simple controller
@@ -21,7 +23,8 @@ class HomeController extends AControllerBase
     {
 //        $aktualita = Aktualita::getAll();
         $num = Configuration::POCET_CLANKOV;
-        $aktualita = Aktualita::getAll( "id > 0 ORDER BY id desc LIMIT $num");
+//        $aktualita = Aktualita::getAll( "id > 0 ORDER BY id desc LIMIT $num");
+        $aktualita = Aktualita::getAllJoin('users', "author_id=users.id", 'actuality.*, users.name AS author_id', "actuality.id > 0 ORDER BY id desc LIMIT $num");
         return $this->html($aktualita);
     }
 
@@ -34,24 +37,49 @@ class HomeController extends AControllerBase
         return $this->html([]);
     }
 
-    /** Funkcia (podstránka "Pridať novú aktualitu"), ktorá slúži pre pridanie novej aktuality. */
+    /** Funkcia, ktorá slúži pre vykreslenie aktuality vo view „viewActuality“ po kliknutí na tlačidlo „Zobraziť viac“ v zozname aktualít */
+    public function viewActuality(): ViewResponse
+    {
+        // TODO: Vytvoriť viewActuality
+
+        $postId = $this->request()->getValue('postid'); // Najskôr hľadá kľúč v poli "_POST", potom v poli "_GET" a ak ho nenájde, vráti NULL.
+        return $this->html([Aktualita::getOne($postId)]);
+    }
+
+    /** Funkcia (podstránka „Pridať novú aktualitu“), ktorá slúži pre pridanie novej aktuality. */
     public function addNewActuality(): ViewResponse
     {
-        if (Auth::isLogged())
+        if (Auth::isLogged() && (Auth::getRole() == 'Admin' || Auth::getRole() == 'Moderator'))
             return $this->html([]);
         else
-            $this->redirectToHome();
+            return $this->html([]);
     }
 
     /** Funkcia pre upload súboru */
     public function upload()
     {   // TODO: Ošetriť prázdny titulok a text
-        $newActuality = new Aktualita();
-        $newActuality->imagePath = $this->moveUploadedFile("subor");
-        $newActuality->title = $this->request()->getValue('titulok');
-        $newActuality->text = $this->request()->getValue('textClanku');
-        $newActuality->save();
-
+        $title = strip_tags($this->request()->getValue('titulok'), Configuration::ALLOWED_TAGS);
+        $perex = strip_tags($this->request()->getValue('perex'), Configuration::ALLOWED_TAGS);
+        $imagePath = $this->moveUploadedFile("subor");
+        $text = strip_tags($this->request()->getValue('textClanku'), Configuration::ALLOWED_TAGS);
+        if (strlen($title) > 5 && strlen($perex) > 5 && strlen($text) > 5) {
+            if (strlen($title) < 255 && strlen($perex) < 255) {
+                $newActuality = new Aktualita();
+                $newActuality->title = $title;
+                $newActuality->perex = $perex;
+                $newActuality->imagePath = $imagePath;
+                $newActuality->text = $text;
+                $newActuality->author_id = $_SESSION['userId'];
+                $newActuality->save();
+            }
+        } else {
+            return $this->html([
+                'titulok' => $title,
+                'perex' => $perex,
+                'textClanku' => $text,
+                'error' => "wrongData"
+            ],'addNewActuality');
+        }
         $this->redirectToHome();    // Presmerujeme
     }
 
@@ -60,7 +88,7 @@ class HomeController extends AControllerBase
     {
         $postId = $this->request()->getValue('postid'); // Najskôr hľadá kľúč v poli "_POST", potom v poli "_GET" a ak ho nenájde, vráti NULL.
 
-        if ($postId && Auth::isLogged()) {                          // Ak sme post našli
+        if ($postId && Auth::isLogged() && Auth::getRole() == "Admin") {                          // Ak sme post našli
             try {
                 $actuality = Aktualita::getOne($postId);
                 $actuality->delete();
@@ -74,10 +102,10 @@ class HomeController extends AControllerBase
         $this->redirectToHome();    // Presmerujeme
     }
 
-    /** Funkcia pre úpravu aktuality */
+    /** Funkcia pre úpravu aktuality - Funkcia pre predvyplnenie formulára */
     public function editActuality()
     {
-        if (Auth::isLogged()) {
+        if (Auth::isLogged() && (Auth::getRole() == 'Moderator' || Auth::getRole() == 'Admin')) {
             $postId = $this->request()->getValue('postid'); // Najskôr hľadá kľúč v poli "_POST", potom v poli "_GET" a ak ho nenájde, vráti NULL.
             $title = $this->request()->getValue('title');
             if ($postId) {                          // Ak sme post našli
@@ -85,6 +113,7 @@ class HomeController extends AControllerBase
                     $actuality = Aktualita::getOne($postId);                                           // Vytiahnem si záznam s daným "$postId" z DB
                     return $this->html([
                         'titulok' => $actuality->title,
+                        'perex' => $actuality->perex,
                         'textClanku' => $actuality->text,
                         'postid' => $postId
                     ]);
@@ -97,25 +126,44 @@ class HomeController extends AControllerBase
 
     public function editActualityPostBack()
     {//TODO: Ošetriť zmenu obrázku
+    // TODO: Doriešiť zmenu dát - DONE
         $postId = $this->request()->getValue('postid'); // Najskôr hľadá kľúč v poli "_POST", potom v poli "_GET" a ak ho nenájde, vráti NULL.
-        $newTitle = $this->request()->getValue('titulok');
+        $newTitle = strip_tags($this->request()->getValue('titulok'), Configuration::ALLOWED_TAGS);
+        $newPerex = strip_tags($this->request()->getValue('perex'), Configuration::ALLOWED_TAGS);
         $newImage = $this->moveUploadedFile("subor");
-        $newText = $this->request()->getValue('textClanku');
+        $newText = strip_tags($this->request()->getValue('textClanku'),Configuration::ALLOWED_TAGS);
 
         if ($postId) {                                      // Ak sme post našli
             $actuality = Aktualita::getOne($postId);        // Vytiahnem si záznam s daným "$postId" z DB
-            Connection::connect()->prepare("UPDATE actuality SET title = ?, imagePath = ?, text = ? WHERE id = ?")    // Pomocou "connect()" si vyžiadam spojenie a preparenem si SQL
-                ->execute([$newTitle ? $newTitle : $actuality->title, $newImage ? $newImage : $actuality->imagePath, $newText ? $newText : $actuality->text, intval($postId)]);    // Spustím ho
+            if (strlen($newTitle) > 5 && strlen($newPerex) > 5 && strlen($newText) > 5) {
+                if (strlen($newTitle) < 255 && strlen($newPerex) < 255) {
+                    $actuality->title = $newTitle;
+                    $actuality->perex = $newPerex;
+                    $actuality->imagePath = $newImage ? $newImage : $actuality->imagePath;
+                    $actuality->text = $newText;
+                    $actuality->save();
+//            Connection::connect()->prepare("UPDATE actuality SET title = ?, imagePath = ?, text = ? WHERE id = ?")    // Pomocou "connect()" si vyžiadam spojenie a preparenem si SQL
+//                ->execute([$newTitle ? $newTitle : $actuality->title, $newImage ? $newImage : $actuality->imagePath, $newText ? $newText : $actuality->text, intval($postId)]);    // Spustím ho
+                }
+            } else {
+                return $this->html([
+                    'titulok' => $actuality->title,
+                    'perex' => $actuality->perex,
+                    'textClanku' => $actuality->text,
+                    'postid' => $postId,
+                    'error' => "wrongData"
+                ],'editActuality');
+            }
         }
         $this->redirectToHome();    // Presmerujeme
     }
 
-    public function goNext()
+    public function goNext(): ViewResponse
     {
         $offset = $this->request()->getValue('offset'); // Najskôr hľadá kľúč v poli "_POST", potom v poli "_GET" a ak ho nenájde, vráti NULL.
         unset($_GET["a"]);
         $num = Configuration::POCET_CLANKOV;
-        $aktualita = Aktualita::getAll( "id > 0 ORDER BY id desc LIMIT $num OFFSET $offset");
+        $aktualita = Aktualita::getAll( "id > 0 ORDER BY id desc LIMIT ? OFFSET $offset");
         return $this->html($aktualita);
     }
 
@@ -127,19 +175,23 @@ class HomeController extends AControllerBase
     }
 
     /** Funkcia pre nahratie súboru z inputu na server.
-     * @return string|null
+     * @return string|null Názov súboru v prípade úspešného nahratia súboru, ináč null.
      */
     private function moveUploadedFile($inputName): ?string
     {
         if (isset($_FILES[$inputName])) {
-            if ($_FILES["$inputName"]["error"] == UPLOAD_ERR_OK) {
-                $tmp_name = $_FILES["$inputName"]["tmp_name"];
+            $ext = strtolower(pathinfo($_FILES[$inputName]['name'], PATHINFO_EXTENSION));
+            $fileType = $_FILES[$inputName]["type"];
+            if (($ext === 'jpg' || $ext === 'jpeg') && $fileType === "image/jpeg") {    // Kontrola typu súboru
+                if ($_FILES["$inputName"]["error"] == UPLOAD_ERR_OK) {
+                    $tmp_name = $_FILES["$inputName"]["tmp_name"];
 
-                $name = time() . "_" . $_FILES["$inputName"]["name"];
-                $path = Configuration::IMAGES_DIR . "/$name";
+                    $name = time() . "_" . $_FILES["$inputName"]["name"];
+                    $path = Configuration::IMAGES_DIR . "/$name";
 
-                move_uploaded_file($tmp_name, $path);
-                return $name;
+                    move_uploaded_file($tmp_name, $path);
+                    return $name;
+                }
             }
         }
         return null;

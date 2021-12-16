@@ -77,3 +77,20 @@ h3.register-success {
 .partialdark {
     background: rgba(128, 128, 128, 0.5);
 }
+
+.perex {
+    /*font-weight: bold;*/
+    font-size: 13px;
+}
+
+.card-body a {
+    text-decoration: none;
+}
+.card-body a:hover {
+    color: black;
+}
+.card-body >.row > .col-11 {
+
+    flex: 0 0 auto;
+    width: 90%;
+}
