@@ -30,5 +30,6 @@ class Configuration
     /** @var int Konštanta určujúca počet aktualít na stránke */
     public const POCET_CLANKOV = 3;
 
+    /** @var string Konštanta určujúca povolené tagy v inputoch */
     public const ALLOWED_TAGS = '<p><b><strong><br><i><em><small><sub><sup><del><ins><mark>';
 }
