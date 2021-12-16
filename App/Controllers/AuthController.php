@@ -66,9 +66,9 @@ class AuthController extends AControllerBase
     public function register()
     {
         if (Auth::isLogged()) {
-            $name = $this->request()->getValue("login");           // Najskôr zistím, či je meno vôbec odoslané
-            $password = $this->request()->getValue("password");    // Najskôr zistím, či je heslo vôbec odoslané
-            $passwordAgain = $this->request()->getValue("passwordAgain");
+            $name = strip_tags($this->request()->getValue("login"));           // Najskôr zistím, či je meno vôbec odoslané
+            $password = strip_tags($this->request()->getValue("password"));    // Najskôr zistím, či je heslo vôbec odoslané
+            $passwordAgain = strip_tags($this->request()->getValue("passwordAgain"));
             if (!empty($name) && !empty($password) && !empty($passwordAgain)) {
                 if (strlen($password) >= 8 && strlen($password) < 255 && ($password === $passwordAgain)) {
                     if (!Auth::isRegistered($name)) {           // Ak užívateľ so zadaným menom ešte nie je zaregistrovaný
@@ -93,8 +93,8 @@ class AuthController extends AControllerBase
     /** Funkcia pre prihlásenie užívateľa. Ak užívateľ zadal platné údaje, prihlási ho, ináč redirect na úvodnú stránku. */
     public function login()
     {
-        $login = $this->request()->getValue("login");           // Najskôr zistím, či je meno vôbec odoslané
-        $password = $this->request()->getValue("password");     // Najskôr zistím, či je heslo vôbec odoslané
+        $login = strip_tags($this->request()->getValue("login"));           // Najskôr zistím, či je meno vôbec odoslané
+        $password = strip_tags($this->request()->getValue("password"));     // Najskôr zistím, či je heslo vôbec odoslané
         if ($login && $password) {                                   // Ak bolo meno a heslo zadané
             if (Auth::login($login, $password)) {                    // Urobíme prihlásenie
                 $this->redirectToHome();
@@ -111,9 +111,9 @@ class AuthController extends AControllerBase
     public function changePassword()
     {
         if (Auth::isLogged()) {
-            $oldPassword = $this->request()->getValue("oldPassword");               // Najskôr zistím, či je heslo vôbec odoslané
-            $newPassword = $this->request()->getValue("password");               // Najskôr zistím, či je heslo vôbec odoslané
-            $newPasswordAgain = $this->request()->getValue("passwordAgain");     // Najskôr zistím, či je heslo vôbec odoslané
+            $oldPassword = strip_tags($this->request()->getValue("oldPassword"));               // Najskôr zistím, či je heslo vôbec odoslané
+            $newPassword = strip_tags($this->request()->getValue("password"));               // Najskôr zistím, či je heslo vôbec odoslané
+            $newPasswordAgain = strip_tags($this->request()->getValue("passwordAgain"));     // Najskôr zistím, či je heslo vôbec odoslané
             if (!empty($oldPassword) && !empty($newPassword) && !empty($newPasswordAgain)) {      // Skontrolujeme, či sú všetky polia vyplnené
                 if (strlen($newPassword) >= 8 && strlen($newPassword) < 255 && ($newPassword === $newPasswordAgain)) {  // Skontrolujeme, či heslo spĺňa dĺžku a či nové heslá sú rovnaké
                     if ($oldPassword !== $newPassword) {
@@ -143,7 +143,7 @@ class AuthController extends AControllerBase
     public function deleteAccount()
     {
         if (Auth::isLogged()) {
-            $password = $this->request()->getValue("password");     // Najskôr zistím, či je heslo vôbec odoslané
+            $password = strip_tags($this->request()->getValue("password"));     // Najskôr zistím, či je heslo vôbec odoslané
             if (!empty($password)) {                                   // Ak bolo meno a heslo zadané
                     if (Auth::deleteAccount($password)) {                    // Urobíme prihlásenie
                         return $this->html(['status' => "passwordOK"], 'deleteAccountForm');
