@@ -6,7 +6,7 @@
             <form method="POST" action="?c=auth&a=register" onsubmit="return (checkLogin() && checkPasswords() ? true : false)">
                 <div class="mb-3">
                     <label for="loginNameInput" class="form-label">Meno</label>
-                    <input type="text" class="form-control" name="login" id="loginNameInput" placeholder="Prihlasovacie meno"onkeyup="checkLogin()">
+                    <input type="text" class="form-control" name="login" id="loginNameInput" placeholder="Prihlasovacie meno" onkeyup="checkLogin()">
                     <div class="valid-feedback">Prihlasovacie meno je OK.</div>
                     <div class="invalid-feedback">Prihlasovacie meno musí mať aspoň 3 znaky!.</div>
                 </div>
