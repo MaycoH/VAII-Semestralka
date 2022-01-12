@@ -4,10 +4,11 @@ namespace App\Controllers;
 
 use App\Config\Configuration;
 use App\Core\AControllerBase;
-use App\Core\DB\Connection;
 use App\Core\Responses\ViewResponse;
+use App\Core\Responses\JsonResponse;
 use App\Models\Aktualita;
 use App\Models\Auth;
+use App\Models\Comment;
 
 // TODO: Ošetrenie neplatných hodnôt
 
@@ -23,8 +24,11 @@ class HomeController extends AControllerBase
     {
 //        $aktualita = Aktualita::getAll();
         $num = Configuration::POCET_CLANKOV;
-//        $aktualita = Aktualita::getAll( "id > 0 ORDER BY id desc LIMIT $num");
-        $aktualita = Aktualita::getAllJoin('users', "author_id=users.id", 'actuality.*, users.name AS author_id', "actuality.id > 0 ORDER BY id desc LIMIT $num");
+        $aktualita = Aktualita::getAll( "id > 0 ORDER BY id desc LIMIT $num");
+        foreach ($aktualita as $act) {
+            $act->author_id = Auth::getOne($act->author_id)->name;
+        }
+//        $aktualita = Aktualita::getAllJoin('users', "author_id=users.id", 'actuality.*, users.name AS author_id', "actuality.id > 0 ORDER BY id desc LIMIT $num");
         return $this->html($aktualita);
     }
 
@@ -125,16 +129,19 @@ class HomeController extends AControllerBase
     }
 
     public function editActualityPostBack()
-    {//TODO: Ošetriť zmenu obrázku
-    // TODO: Doriešiť zmenu dát - DONE
+    {
         $postId = $this->request()->getValue('postid'); // Najskôr hľadá kľúč v poli "_POST", potom v poli "_GET" a ak ho nenájde, vráti NULL.
         $newTitle = strip_tags($this->request()->getValue('titulok'), Configuration::ALLOWED_TAGS);
         $newPerex = strip_tags($this->request()->getValue('perex'), Configuration::ALLOWED_TAGS);
         $newImage = $this->moveUploadedFile("subor");
         $newText = strip_tags($this->request()->getValue('textClanku'),Configuration::ALLOWED_TAGS);
 
-        if ($postId) {                                      // Ak sme post našli
-            $actuality = Aktualita::getOne($postId);        // Vytiahnem si záznam s daným "$postId" z DB
+        if (is_numeric($postId) && $postId) {                                      // Ak sme post našli
+            try {
+                $actuality = Aktualita::getOne($postId);
+            } catch (\Exception $e) {       // Neplatné Post ID
+                $this->redirectToHome();
+            }
             if (strlen($newTitle) > 5 && strlen($newPerex) > 5 && strlen($newText) > 5) {
                 if (strlen($newTitle) < 255 && strlen($newPerex) < 255) {
                     $actuality->title = $newTitle;
@@ -158,13 +165,20 @@ class HomeController extends AControllerBase
         $this->redirectToHome();    // Presmerujeme
     }
 
-    public function goNext(): ViewResponse
+    public function goNext()
     {
-        $offset = $this->request()->getValue('offset'); // Najskôr hľadá kľúč v poli "_POST", potom v poli "_GET" a ak ho nenájde, vráti NULL.
+        $offset = strip_tags($this->request()->getValue('offset')); // Najskôr hľadá kľúč v poli "_POST", potom v poli "_GET" a ak ho nenájde, vráti NULL.
         unset($_GET["a"]);
-        $num = Configuration::POCET_CLANKOV;
-        $aktualita = Aktualita::getAll( "id > 0 ORDER BY id desc LIMIT ? OFFSET $offset");
-        return $this->html($aktualita);
+        if (is_numeric($offset)) {
+            $offset *= 1;
+            $num = Configuration::POCET_CLANKOV;
+            try {
+                $aktualita = Aktualita::getAll("id > 0 ORDER BY id desc LIMIT $num OFFSET $offset");
+            } catch (\Exception $e) { // Neplatné ID
+                $this->redirectToHome();
+            }
+            return $this->html($aktualita);
+        } else $this->redirectToHome();
     }
 
     /** Funkcia pre redirect na úvod */
@@ -195,5 +209,41 @@ class HomeController extends AControllerBase
             }
         }
         return null;
+    }
+
+    /** Funkcia pre získanie všetkých komentárov prislúchajúcich danému príspevku z DB a zaslanie klientovi
+     * @return JsonResponse odpoveď klientovi so zoznamom komentárov patriacich danému príspevku vo forme JSON správy */
+    public function getAllComments(): JsonResponse
+    {
+        $postId = strip_tags($this->request()->getValue("postid"));
+        if (is_numeric($postId)) {
+            $comments = Comment::getAll("actuality_id = ?", [$postId]);
+            foreach ($comments as $comment) {
+                try {
+                    $comment->author_id = Auth::getOne($comment->author_id)->name;
+                } catch (\Exception $e) {
+                }
+            }
+            return $this->json($comments);
+        }
+        return  $this->json(null);
+    }
+
+    /** Funkcia pre pridanie nového komentára do DB
+     * @return JsonResponse odpoveď klientovi o úspešnosti pridania vo forme JSON správy */
+    public function addComment(): JsonResponse
+    {
+        $msgText = strip_tags($this->request()->getValue("comment"));
+        $post_id = strip_tags($this->request()->getValue("post_id"));
+        $author_id = Auth::getId();
+        if (strlen($msgText) < 3 || !is_numeric($post_id)) {
+            return $this->json("Error");
+        }
+        $msg = new Comment();
+        $msg->comment = $msgText;
+        $msg->actuality_id = $post_id;
+        $msg->author_id = $author_id;
+        $msg->save();
+        return $this->json("OK");
     }
 }

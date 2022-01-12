@@ -19,8 +19,20 @@ use App\Models\Auth; ?>
                         <?php } ?>
                         <h5 id="perex"> <?= $aktualita->perex ?> </h5>
                     </div>
-                    <img src="<?= Configuration::ROOT_DIR."/". Configuration::IMAGES_DIR."/$aktualita->imagePath" ?>" class="img-responsive" alt="..." >
+                    <img src="<?= Configuration::IMAGES_DIR."/$aktualita->imagePath" ?>" class="img-responsive" alt="..." >
                     <p class="card-text"> <?= $aktualita->text ?> </p>
+                </div>
+            </div>
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h3> Komentáre k článku </h3>
+                    <?php if (Auth::isLogged()) { ?>
+                    <div>
+                        <input id="comment-text" type="text" placeholder="Zadaj text komentára...">
+                        <button id="btn-odoslat">Odoslať komentár</button>
+                    </div>
+                    <?php } ?>
+                    <div id="comments"></div>       <!-- TU budú komentáre -->
                 </div>
             </div>
             <?php } ?>
