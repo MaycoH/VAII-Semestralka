@@ -18,7 +18,7 @@ services:
       MYSQL_USER: db_user
       MYSQL_PASSWORD: db_user_pass
     ports:
-      - "3306:3306"
+      - "127.0.0.1:3306:3306"
   phpmyadmin:
     links:
       - db
