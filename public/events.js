@@ -10,7 +10,7 @@ class Events {
                           + "<div class='event-time' id='title'> Koniec udalosti: </div><div class='event-time'>" + new Date(Date.parse(message.endTime)).toLocaleString('sk') + "</div>"
                           + "<div class='event-place' id='title'> Miesto konania: </div><div class='event-place'>" + message.place + "</div>"
                           + "<div class='event-description' id='title'> Popis udalosti: </div><div class='event-description'>" + message.eventDescription + "</div></div></div>";
-                    document.getElementById("comments").innerHTML = html;    // Vopchatie stringu do elementu
+                    document.getElementById("events").innerHTML = html;    // Vopchatie stringu do elementu
                 }
             });
     }

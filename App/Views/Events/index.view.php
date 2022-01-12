@@ -41,7 +41,7 @@ use App\Config\Configuration; ?>
             <?php } ?>
             <div class="card mb-3">
                 <h3 class="card-body">Udalosti: </h3>  <!-- Vytvorí rámec pre jednotlivú položku   -->
-                <div id="comments"></div>
+                <div id="events"></div>
             </div>
         </div>
     </div>
