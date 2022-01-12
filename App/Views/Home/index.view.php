@@ -11,8 +11,8 @@ use App\Models\Auth; ?>
             <div class="card mb-3">   <!-- style="width: 18rem;"   style="max-width: 540px;"   -->
                 <div class="row g-0">
                     <div class="col-md-4">
-                        <a href="?c=home&a=vriewActuality&postid=<?= $aktualita->id ?>">
-                            <img src="<?= Configuration::ROOT_DIR."/". Configuration::IMAGES_DIR."/$aktualita->imagePath" ?>" class="img-responsive" alt="<?= $aktualita->title ?>" >
+                        <a href="?c=home&a=viewActuality&postid=<?= $aktualita->id ?>">
+                            <img src="<?= Configuration::IMAGES_DIR."/$aktualita->imagePath" ?>" class="img-responsive" alt="<?= $aktualita->title ?>" >
                         </a>
                     </div>
                     <div class="col-md-8">
