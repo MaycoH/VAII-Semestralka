@@ -94,3 +94,34 @@ h3.register-success {
     flex: 0 0 auto;
     width: 90%;
 }
+.comment-nick {
+    float: left;
+    margin-right: 6px;
+    font-weight: bold;
+    color: darkblue;
+}
+.event-time {
+    color: darkblue;
+}
+
+.event-time#title {
+    float: left;
+    margin-right: 6px;
+    font-weight: bold;
+
+}
+.event-description {
+    color: black;
+}
+.event-description#title {
+    /*float: left;*/
+    margin-right: 6px;
+    font-weight: bold;
+    color: red;
+}
+.event-place#title {
+    float: left;
+    margin-right: 6px;
+    font-weight: bold;
+    color: red;
+}

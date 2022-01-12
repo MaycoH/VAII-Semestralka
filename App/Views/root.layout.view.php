@@ -18,6 +18,8 @@ if (isset($_GET["c"])) {            // Ak je zvolený Controller
         if($_GET["c"] == "auth" && $_GET["a"] == "changePassForm")
             $stranka = "Zmena hesla";
     }
+    if($_GET["c"] == "events")
+        $stranka = "Udalosti";
 }
 ?>
 <!DOCTYPE html>
@@ -30,6 +32,15 @@ if (isset($_GET["c"])) {            // Ak je zvolený Controller
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <script src="<?= Configuration::ROOT_DIR ?>/public/script.js"></script>
+    <?php if (isset($_GET["a"])) {
+        if ($_GET["a"] == "viewActuality") { ?>
+    <script src="<?= Configuration::ROOT_DIR ?>/public/comments.js"></script>
+    <?php }
+    } if (isset($_GET["c"])) {
+        if ($_GET["c"] == "events") { ?>
+    <script src="<?= Configuration::ROOT_DIR ?>/public/events.js"></script>
+    <?php }
+    } ?>
     <link rel="stylesheet" href="<?= Configuration::ROOT_DIR ?>/public/css.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.0/font/bootstrap-icons.css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -47,6 +58,9 @@ if (isset($_GET["c"])) {            // Ak je zvolený Controller
                     <a class="nav-link <?php $stranka == "Aktuality" ? print("active") : "" ?>" href="?c=home">Aktuality</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link <?php $stranka == "Udalosti" ? print("active") : "" ?>" href="?c=events">Udalosti</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link <?php $stranka == "Kontakt" ? print("active") : "" ?>" href="?c=home&a=contact">Kontakt</a>
                 </li>
 
@@ -57,10 +71,12 @@ if (isset($_GET["c"])) {            // Ak je zvolený Controller
                     <li class="nav-item">
                         <a class="nav-link <?php $stranka == "Registrácia" ? print("active") : "" ?>" href="?c=auth&a=registerForm">Registrácia</a>
                     </li>
-                <?php } else { ?>
+                <?php } else {
+                    if (Auth::getRole() == 'Admin' || Auth::getRole() == 'Moderator') { ?>
                     <li class="nav-item">
                         <a class="nav-link <?php $stranka == "Pridať novú aktualitu" ? print("active") : "" ?> " href="?c=home&a=addNewActuality">Pridať novú aktualitu</a>
                     </li>
+                    <?php } ?>
                     <li class="nav-item">
                         <a class="nav-link <?php $stranka == "Zmena hesla" ? print("active") : "" ?>" href="?c=auth&a=changePassForm">Zmena hesla</a>
                     </li>
