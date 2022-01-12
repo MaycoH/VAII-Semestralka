@@ -34,7 +34,7 @@ use App\Config\Configuration; ?>
                     </div>
                     <div class="mt-3">
                         <button class="btn btn-success" id="btn-odoslat">Odošli</button>
-                        <input type="reset" value="Zruš zmeny" class="btn btn-danger ms-4">     <!-- margin-left -->
+                        <button class="btn btn-danger ms-4" id="btn-clear">Vymaž</button>     <!-- margin-left -->
                     </div>
                 </div>
             </div>

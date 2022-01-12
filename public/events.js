@@ -104,6 +104,12 @@ window.onload = function () {
         events.createEvent();
         events.getAllEvents();
     }
+    document.getElementById("btn-clear").onclick = () => {
+        document.getElementById("startTime").value = null;
+        document.getElementById("endTime").value = null;
+        document.getElementById("place").value = null;
+        document.getElementById("eventDescription").value = null;
+    }
 }
 
 function checkInput(input) {
