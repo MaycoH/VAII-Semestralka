@@ -1,4 +1,5 @@
-<?php /** @var Array[] $data */ ?>
+<?php /** @var \App\Models\Aktualita[] $data */ ?>
+
 <div class="row">
     <div class="col">
         <form method="POST" enctype="multipart/form-data" action="?c=home&a=upload"> <!-- controller = "Home", akcia = "upload" enctype="multipart/form-data"-->
