@@ -9,7 +9,7 @@ namespace App\Config;
  */
 class Configuration
 {
-    public const DB_HOST = 'localhost';
+    public const DB_HOST = 'db';
     public const DB_NAME = 'covidinfo';
     public const DB_USER = 'root';
     public const DB_PASS = 'dtb456';
@@ -23,10 +23,9 @@ class Configuration
     public const UPLOAD_DIR = "public/files";
 
     /** @var string Konštanta určujúca root adresár projektu */
-    public const ROOT_DIR = "Semestralka";
+    public const ROOT_DIR = "";
     /** @var string Konštanta určujúca podadresár s obrázkami projektu */
-    public const IMAGES_DIR = "public/images";
-//    public const IMAGES_DIR = Configuration::ROOT_DIR."public/images";
+    public const IMAGES_DIR = Configuration::ROOT_DIR."public/images";
     /** @var int Konštanta určujúca počet aktualít na stránke */
     public const POCET_CLANKOV = 3;
 
