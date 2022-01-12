@@ -65,7 +65,7 @@ class AuthController extends AControllerBase
      * zaregistruje ho, ináč redirect na úvodnú stránku.      */
     public function register()
     {
-        if (Auth::isLogged()) {
+        if (!Auth::isLogged()) {
             $name = strip_tags($this->request()->getValue("login"));           // Najskôr zistím, či je meno vôbec odoslané
             $password = strip_tags($this->request()->getValue("password"));    // Najskôr zistím, či je heslo vôbec odoslané
             $passwordAgain = strip_tags($this->request()->getValue("passwordAgain"));
