@@ -169,4 +169,9 @@ class Auth extends Model
             return "Guest";
         }
     }
+
+    public static function getId() {
+        if (isset($_SESSION['userId']))
+            return $_SESSION['userId'];
+    }
 }
