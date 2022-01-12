@@ -4,9 +4,6 @@ namespace App\Models;
 
 use App\Core\Model;
 
-use App\Core\DB\Connection;
-use PDOException;
-
 class Aktualita extends Model
 {
     public $id;
