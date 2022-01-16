@@ -22,17 +22,12 @@ body {
     background-color: darkblue !important;
 }
 
-.btn-outline-success {
-    color: yellow !important;
-    border-color: yellow !important;
-}
-
 a.nav-link {
     padding-left: 0.5rem !important;
 }
 
 a.dropdown-item.active {
-    color: white !important;
+    color: white;
 }
 
 .nav-link.active, .dropdown-item.active {
