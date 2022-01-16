@@ -10,8 +10,6 @@ use App\Models\Aktualita;
 use App\Models\Auth;
 use App\Models\Comment;
 
-// TODO: Ošetrenie neplatných hodnôt
-
 /**
  * Class HomeController
  * Example of simple controller
