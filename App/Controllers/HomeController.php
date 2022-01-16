@@ -44,8 +44,6 @@ class HomeController extends AControllerBase
     /** Funkcia, ktorá slúži pre vykreslenie aktuality vo view „viewActuality“ po kliknutí na tlačidlo „Zobraziť viac“ v zozname aktualít */
     public function viewActuality(): ViewResponse
     {
-        // TODO: Vytvoriť viewActuality
-
         $postId = $this->request()->getValue('postid'); // Najskôr hľadá kľúč v poli "_POST", potom v poli "_GET" a ak ho nenájde, vráti NULL.
         return $this->html([Aktualita::getOne($postId)]);
     }
@@ -61,7 +59,7 @@ class HomeController extends AControllerBase
 
     /** Funkcia pre upload súboru */
     public function upload()
-    {   // TODO: Ošetriť prázdny titulok a text
+    {
         $title = strip_tags($this->request()->getValue('titulok'), Configuration::ALLOWED_TAGS);
         $perex = strip_tags($this->request()->getValue('perex'), Configuration::ALLOWED_TAGS);
         $imagePath = $this->moveUploadedFile("subor");
@@ -72,7 +70,7 @@ class HomeController extends AControllerBase
                 $newActuality->title = $title;
                 $newActuality->perex = $perex;
                 $newActuality->imagePath = $imagePath;
-                $newActuality->text = $text;
+                $newActuality->text = preg_replace('/\R/', '<br>', $text);
                 $newActuality->author_id = $_SESSION['userId'];
                 $newActuality->save();
             }
@@ -117,7 +115,7 @@ class HomeController extends AControllerBase
                     return $this->html([
                         'titulok' => $actuality->title,
                         'perex' => $actuality->perex,
-                        'textClanku' => $actuality->text,
+                        'textClanku' => preg_replace('/<br(\s+\/)?>/', "\r\n", $actuality->text),       // regexp na <br> aj <br />
                         'postid' => $postId
                     ]);
                 } catch (\Exception $e) {               // V prípade výnimky (neplatné ID) redirectni
@@ -147,7 +145,7 @@ class HomeController extends AControllerBase
                     $actuality->title = $newTitle;
                     $actuality->perex = $newPerex;
                     $actuality->imagePath = $newImage ? $newImage : $actuality->imagePath;
-                    $actuality->text = $newText;
+                    $actuality->text = preg_replace('/\R/', '<br>', $newText);      // regexp na všetky typy newLine
                     $actuality->save();
 //            Connection::connect()->prepare("UPDATE actuality SET title = ?, imagePath = ?, text = ? WHERE id = ?")    // Pomocou "connect()" si vyžiadam spojenie a preparenem si SQL
 //                ->execute([$newTitle ? $newTitle : $actuality->title, $newImage ? $newImage : $actuality->imagePath, $newText ? $newText : $actuality->text, intval($postId)]);    // Spustím ho
