@@ -17,6 +17,8 @@ if (isset($_GET["c"])) {            // Ak je zvolený Controller
             $stranka = "Registrácia";
         if($_GET["c"] == "auth" && $_GET["a"] == "changePassForm")
             $stranka = "Zmena hesla";
+        if($_GET["c"] == "auth" && $_GET["a"] == "deleteAccountForm")
+            $stranka = "Zrušenie účtu";
     }
     if($_GET["c"] == "events")
         $stranka = "Udalosti";
@@ -72,16 +74,21 @@ if (isset($_GET["c"])) {            // Ak je zvolený Controller
                         <a class="nav-link <?php $stranka == "Registrácia" ? print("active") : "" ?>" href="?c=auth&a=registerForm">Registrácia</a>
                     </li>
                 <?php } else {
-                    if (Auth::getRole() == 'Admin' || Auth::getRole() == 'Moderator') { ?>
+                    if (Auth::isModerator()) { ?>
                     <li class="nav-item">
                         <a class="nav-link <?php $stranka == "Pridať novú aktualitu" ? print("active") : "" ?> " href="?c=home&a=addNewActuality">Pridať novú aktualitu</a>
                     </li>
                     <?php } ?>
-                    <li class="nav-item">
-                        <a class="nav-link <?php $stranka == "Zmena hesla" ? print("active") : "" ?>" href="?c=auth&a=changePassForm">Zmena hesla</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="?c=auth&a=logout">Odhlásenie</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle <?php $stranka == "Zmena hesla" || $stranka == "Zrušenie účtu" ? print("active") : "" ?>" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Správa účtu</a>
+                        <ul class="dropdown-menu">
+                            <li><span class="dropdown-item-text">Prihlásený: <?php print(Auth::getLoggedName()) ?> </span></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item <?php $stranka == "Zmena hesla" ? print("active") : "" ?>" href="?c=auth&a=changePassForm">Zmena hesla</a></li>
+                            <li><a class="dropdown-item <?php $stranka == "Zrušenie účtu" ? print("active") : "" ?>" href="?c=auth&a=deleteAccountForm">Zrušenie účtu</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="?c=auth&a=logout">Odhlásenie</a></li>
+                        </ul>
                     </li>
                 <?php } ?>
             </ul>
