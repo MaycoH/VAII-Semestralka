@@ -13,12 +13,12 @@ services:
     volumes:
       - ./sql:/docker-entrypoint-initdb.d
     environment:
-      MYSQL_ROOT_PASSWORD: heslo
-      MYSQL_DATABASE: databaza
+      MYSQL_ROOT_PASSWORD: dtb456
+      MYSQL_DATABASE: covidinfo
       MYSQL_USER: db_user
       MYSQL_PASSWORD: db_user_pass
     ports:
-      - "127.0.0.1:3306:3306"
+      - "3306:3306"
   phpmyadmin:
     links:
       - db
