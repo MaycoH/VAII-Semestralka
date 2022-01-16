@@ -21,7 +21,7 @@ class EventsController extends AControllerBase
      * @return JsonResponse odpoveď klientovi o úspešnosti pridania vo forme JSON správy */
     public function createNewEvent(): JsonResponse
     {
-        if (Auth::isLogged()) {
+         if (Auth::isLogged()) {
             $zaciatok = strip_tags($this->request()->getValue('zaciatok'));    // 2022-01-10T12:30
             try {
                 $beginTime = date('Y-m-d H:i', strtotime($zaciatok) ?: throw new \Exception("Date or time of begin is wrong"));
@@ -50,6 +50,7 @@ class EventsController extends AControllerBase
                 $newEvent = new Event();
                 $newEvent->startTime = $beginTime;
                 $newEvent->endTime = $endTime;
+                $newEvent->place = $miesto;
                 $newEvent->eventDescription = $popis;
                 $newEvent->save();
                 return $this->json("OK");

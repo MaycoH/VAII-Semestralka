@@ -70,7 +70,7 @@ class Events {
         if (error) return;
 
         /** V prípade, že text.length >= 3, správa sa odošle na server a on odošle odpoveď. */
-        fetch("?c=actions&a=createNewEvent", {
+        fetch("?c=events&a=createNewEvent", {
             method: 'POST',
             body: formData
         })
