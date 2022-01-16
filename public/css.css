@@ -1,16 +1,14 @@
-
 @media (max-width: 675.98px) {
     .container {
-        /*max-width: 342px;*/
-        /*margin-left: 4px;*/
-        /*margin-right: 4px;*/
         padding-left: 4px;
-        padding-right:4px;
+        padding-right: 4px;
     }
+
     .navbar > .container {
-        padding-right: var(--bs-gutter-x,.75rem);
-        padding-left: var(--bs-gutter-x,.75rem);
+        padding-right: var(--bs-gutter-x, .75rem);
+        padding-left: var(--bs-gutter-x, .75rem);
     }
+
     div > .row {
         --bs-gutter-x: 0;
     }
@@ -18,11 +16,12 @@
 
 body {
     background-color: white;
-    /*padding-top: 4.5rem*/
 }
+
 .bg-dark {
     background-color: darkblue !important;
 }
+
 .btn-outline-success {
     color: yellow !important;
     border-color: yellow !important;
@@ -32,13 +31,17 @@ a.nav-link {
     padding-left: 0.5rem !important;
 }
 
-.nav-link.active {
+a.dropdown-item.active {
+    color: white !important;
+}
+
+.nav-link.active, .dropdown-item.active {
     border: 1px solid white;
     background-color: rgba(255, 80, 128, 0.5);
     border-radius: 0.5rem;
 }
 
-.nav-link:hover {
+.nav-link:hover, .dropdown-item:hover {
     color: orange !important;
     background-color: rgba(128, 80, 128, 0.5);
     border: 1px dotted white;
@@ -58,18 +61,15 @@ a.nav-link {
 
 .img-responsive {
     /*border-radius: 1rem;*/
-    display:block;
-    max-width:100%;
-    height:auto;
+    display: block;
+    max-width: 100%;
+    height: auto;
 }
 
-/*.mapa {
-    width: 100%;
-    height: 400;
-}*/
 h3.register-error {
     color: red;
 }
+
 h3.register-success {
     color: green;
 }
@@ -78,28 +78,32 @@ h3.register-success {
     background: rgba(128, 128, 128, 0.5);
 }
 
-.perex {
-    /*font-weight: bold;*/
-    font-size: 13px;
+.Author {
+    font-size: .925rem;
+    color: dimgray;
 }
 
 .card-body a {
     text-decoration: none;
 }
+
 .card-body a:hover {
     color: black;
 }
-.card-body >.row > .col-11 {
+
+.card-body > .row > .col-11 {
 
     flex: 0 0 auto;
     width: 90%;
 }
+
 .comment-nick {
     float: left;
     margin-right: 6px;
     font-weight: bold;
     color: darkblue;
 }
+
 .event-time {
     color: darkblue;
 }
@@ -110,18 +114,42 @@ h3.register-success {
     font-weight: bold;
 
 }
+
 .event-description {
     color: black;
 }
+
 .event-description#title {
     /*float: left;*/
     margin-right: 6px;
     font-weight: bold;
     color: red;
 }
+
 .event-place#title {
     float: left;
     margin-right: 6px;
     font-weight: bold;
     color: red;
+}
+
+.dropdown-item {
+    color: #8c8cca;
+}
+
+.dropdown-item-text {
+    color: white;
+}
+
+.dropdown-menu {
+    border-color: #8c8cca;
+}
+
+.dropdown-divider {
+    border-color: white;
+    color: white;
+}
+
+.dmBg-midnightblue {
+    background-color: midnightblue;
 }

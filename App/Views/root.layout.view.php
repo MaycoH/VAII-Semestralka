@@ -81,7 +81,7 @@ if (isset($_GET["c"])) {            // Ak je zvolený Controller
                     <?php } ?>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle <?php $stranka == "Zmena hesla" || $stranka == "Zrušenie účtu" ? print("active") : "" ?>" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Správa účtu</a>
-                        <ul class="dropdown-menu">
+                        <ul class="dropdown-menu dmBg-midnightblue">
                             <li><span class="dropdown-item-text">Prihlásený: <?php print(Auth::getLoggedName()) ?> </span></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item <?php $stranka == "Zmena hesla" ? print("active") : "" ?>" href="?c=auth&a=changePassForm">Zmena hesla</a></li>
