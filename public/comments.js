@@ -44,6 +44,8 @@ class Comments {
             .then(response => {                 // Odošleme odpoveď
                 if (response == "Error") {
                     alert("Komentár je moc krátky. SERVER");
+                } else if (response == "notLogged") {
+                    alert("Nie ste prihlásený!");
                 }
             });
     }

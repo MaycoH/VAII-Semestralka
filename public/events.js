@@ -88,7 +88,10 @@ class Events {
                 alert("Odpoveď zo servera: \nEvent už skončil!");
             else if (response == "placeIsShort")
                 alert("Odpoveď zo servera: \nMiesto je neplatné. Musí obsahovať > 5 a < 255 znakov!");
-            }
+            else if (response == "notLogged")
+                alert("Odpoveď zo servera: \nNie ste prihlásení, nemôžete pridať novú udalosť!");
+
+        }
         );
     }
 }

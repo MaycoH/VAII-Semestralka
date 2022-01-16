@@ -216,7 +216,7 @@ class HomeController extends AControllerBase
     public function getAllComments(): JsonResponse
     {
         $postId = strip_tags($this->request()->getValue("postid"));
-        if (is_numeric($postId)) {
+        if (is_numeric($postId * 1)) {
             $comments = Comment::getAll("actuality_id = ?", [$postId]);
             foreach ($comments as $comment) {
                 try {
@@ -233,17 +233,19 @@ class HomeController extends AControllerBase
      * @return JsonResponse odpoveď klientovi o úspešnosti pridania vo forme JSON správy */
     public function addComment(): JsonResponse
     {
-        $msgText = strip_tags($this->request()->getValue("comment"));
-        $post_id = strip_tags($this->request()->getValue("post_id"));
-        $author_id = Auth::getId();
-        if (strlen($msgText) < 3 || !is_numeric($post_id)) {
-            return $this->json("Error");
-        }
-        $msg = new Comment();
-        $msg->comment = $msgText;
-        $msg->actuality_id = $post_id;
-        $msg->author_id = $author_id;
-        $msg->save();
-        return $this->json("OK");
+        if (Auth::isLogged()) {
+            $msgText = strip_tags($this->request()->getValue("comment"));
+            $post_id = strip_tags($this->request()->getValue("post_id"));
+            $author_id = Auth::getId();
+            if (strlen($msgText) < 3 || !is_numeric($post_id)) {
+                return $this->json("Error");
+            }
+            $msg = new Comment();
+            $msg->comment = $msgText;
+            $msg->actuality_id = $post_id;
+            $msg->author_id = $author_id;
+            $msg->save();
+            return $this->json("OK");
+        } else return $this->json("notLogged");
     }
 }
