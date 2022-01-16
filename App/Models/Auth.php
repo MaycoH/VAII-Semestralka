@@ -170,7 +170,20 @@ class Auth extends Model
         }
     }
 
-    public static function getId() {
+    public static function isAdmin()
+    {
+        return Auth::isLogged() && Auth::getOne($_SESSION['userId'])->role == "Admin";
+
+    }
+
+    public static function isModerator()
+    {
+        return Auth::isLogged()
+            && (Auth::getOne($_SESSION['userId'])->role == "Admin"
+            || Auth::getOne($_SESSION['userId'])->role == "Moderator");
+    }
+
+    public static function getUserId() {
         if (isset($_SESSION['userId']))
             return $_SESSION['userId'];
     }

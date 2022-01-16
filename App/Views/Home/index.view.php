@@ -31,10 +31,10 @@ use App\Models\Auth; ?>
                         </div>
                         <?php if (Auth::isLogged() ) { ?>
                             <div class="col col-1 text-end">
-                                <?php if (Auth::getRole() == 'Admin' || Auth::getRole() == 'Moderator') { ?>
+                                <?php if (Auth::isModerator()) { ?>
                                 <a href="?c=home&a=editActuality&postid=<?= $aktualita->id ?>" class="btn btn-warning"> <i class="bi bi-pencil"></i></a>
                                 <?php } ?>
-                                <?php if (Auth::getRole() == 'Admin') { ?>
+                                <?php if (Auth::isAdmin()) { ?>
                                 <a href="?c=home&a=removeActuality&postid=<?= $aktualita->id ?>" class="btn btn-danger"> <i class="bi bi-trash"></i></a>
                                 <?php } ?>
                             </div>
@@ -56,11 +56,13 @@ use App\Models\Auth; ?>
                 <?php }
                     $pocCl = Configuration::POCET_CLANKOV;
                     isset($_GET["offset"]) ? $offset_tmp = $_GET["offset"] + $pocCl : $offset_tmp = 0;
-                    $count = Connection::connect()->prepare("SELECT * FROM actuality ORDER BY id desc LIMIT $pocCl OFFSET $offset_tmp");    // Pomocou "connect()" si vyžiadam spojenie a preparenem si SQL
+                    // Kontrola, či existujú staršie články na výpis
+                    $nextPocCl = $offset_tmp + $pocCl;
+                    $count = Connection::connect()->prepare("SELECT * FROM actuality ORDER BY id desc LIMIT $pocCl OFFSET $nextPocCl");    // Pomocou "connect()" si vyžiadam spojenie a preparenem si SQL
                     $count->execute([]);    // Spustím ho
                     $count2 = $count->fetch();
 
-                    if(count($data) > 1 && $count2 != false) {
+                    if(count($data) > Configuration::POCET_CLANKOV - 1 && $count2 != false) {
                     print('<div class="col text-end"><a href="?c=home&a=goNext&offset=');
                         if (isset($_GET["offset"])) {
                             ((print($_GET["offset"] += Configuration::POCET_CLANKOV)));

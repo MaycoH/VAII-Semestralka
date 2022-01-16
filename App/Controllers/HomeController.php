@@ -53,7 +53,7 @@ class HomeController extends AControllerBase
     /** Funkcia (podstránka „Pridať novú aktualitu“), ktorá slúži pre pridanie novej aktuality. */
     public function addNewActuality(): ViewResponse
     {
-        if (Auth::isLogged() && (Auth::getRole() == 'Admin' || Auth::getRole() == 'Moderator'))
+        if (Auth::isModerator())
             return $this->html([]);
         else
             return $this->html([]);
@@ -90,9 +90,9 @@ class HomeController extends AControllerBase
     /** Funkcia pre zmazanie aktuality */
     public function removeActuality()
     {
-        $postId = $this->request()->getValue('postid'); // Najskôr hľadá kľúč v poli "_POST", potom v poli "_GET" a ak ho nenájde, vráti NULL.
+        $postId = strip_tags($this->request()->getValue('postid')); // Najskôr hľadá kľúč v poli "_POST", potom v poli "_GET" a ak ho nenájde, vráti NULL.
 
-        if ($postId && Auth::isLogged() && Auth::getRole() == "Admin") {                          // Ak sme post našli
+        if ($postId * 1 && Auth::isAdmin()) {                          // Ak sme post našli
             try {
                 $actuality = Aktualita::getOne($postId);
                 $actuality->delete();
@@ -109,10 +109,9 @@ class HomeController extends AControllerBase
     /** Funkcia pre úpravu aktuality - Funkcia pre predvyplnenie formulára */
     public function editActuality()
     {
-        if (Auth::isLogged() && (Auth::getRole() == 'Moderator' || Auth::getRole() == 'Admin')) {
-            $postId = $this->request()->getValue('postid'); // Najskôr hľadá kľúč v poli "_POST", potom v poli "_GET" a ak ho nenájde, vráti NULL.
-            $title = $this->request()->getValue('title');
-            if ($postId) {                          // Ak sme post našli
+        if (Auth::isModerator()) {
+            $postId = strip_tags($this->request()->getValue('postid')); // Najskôr hľadá kľúč v poli "_POST", potom v poli "_GET" a ak ho nenájde, vráti NULL.
+            if (is_numeric($postId)) {                          // Ak sme post našli
                 try {
                     $actuality = Aktualita::getOne($postId);                                           // Vytiahnem si záznam s daným "$postId" z DB
                     return $this->html([
@@ -124,19 +123,20 @@ class HomeController extends AControllerBase
                 } catch (\Exception $e) {               // V prípade výnimky (neplatné ID) redirectni
                     $this->redirectToHome();
                 }
-            }
-        } else $this->redirectToHome();
+            } else $this->redirectToHome();
+
+    } else $this->redirectToHome();
     }
 
     public function editActualityPostBack()
     {
-        $postId = $this->request()->getValue('postid'); // Najskôr hľadá kľúč v poli "_POST", potom v poli "_GET" a ak ho nenájde, vráti NULL.
+        $postId = strip_tags($this->request()->getValue('postid')); // Najskôr hľadá kľúč v poli "_POST", potom v poli "_GET" a ak ho nenájde, vráti NULL.
         $newTitle = strip_tags($this->request()->getValue('titulok'), Configuration::ALLOWED_TAGS);
         $newPerex = strip_tags($this->request()->getValue('perex'), Configuration::ALLOWED_TAGS);
         $newImage = $this->moveUploadedFile("subor");
         $newText = strip_tags($this->request()->getValue('textClanku'),Configuration::ALLOWED_TAGS);
 
-        if (is_numeric($postId) && $postId) {                                      // Ak sme post našli
+        if (is_numeric($postId)) {                                      // Ak sme post našli
             try {
                 $actuality = Aktualita::getOne($postId);
             } catch (\Exception $e) {       // Neplatné Post ID
@@ -168,12 +168,14 @@ class HomeController extends AControllerBase
     public function goNext()
     {
         $offset = strip_tags($this->request()->getValue('offset')); // Najskôr hľadá kľúč v poli "_POST", potom v poli "_GET" a ak ho nenájde, vráti NULL.
-        unset($_GET["a"]);
+        if (isset($_GET["a"])) unset($_GET["a"]);
         if (is_numeric($offset)) {
-            $offset *= 1;
             $num = Configuration::POCET_CLANKOV;
             try {
                 $aktualita = Aktualita::getAll("id > 0 ORDER BY id desc LIMIT $num OFFSET $offset");
+                foreach ($aktualita as $act) {
+                    $act->author_id = Auth::getOne($act->author_id)->name;
+                }
             } catch (\Exception $e) { // Neplatné ID
                 $this->redirectToHome();
             }
@@ -194,8 +196,8 @@ class HomeController extends AControllerBase
     private function moveUploadedFile($inputName): ?string
     {
         if (isset($_FILES[$inputName])) {
-            $ext = strtolower(pathinfo($_FILES[$inputName]['name'], PATHINFO_EXTENSION));
-            $fileType = $_FILES[$inputName]["type"];
+            $ext = strip_tags(strtolower(pathinfo($_FILES[$inputName]['name'], PATHINFO_EXTENSION)));   // ext = prípona názvu súboru
+            $fileType = $_FILES[$inputName]["type"];                                              // filetype = MIME typ súboru
             if (($ext === 'jpg' || $ext === 'jpeg') && $fileType === "image/jpeg") {    // Kontrola typu súboru
                 if ($_FILES["$inputName"]["error"] == UPLOAD_ERR_OK) {
                     $tmp_name = $_FILES["$inputName"]["tmp_name"];
@@ -216,7 +218,7 @@ class HomeController extends AControllerBase
     public function getAllComments(): JsonResponse
     {
         $postId = strip_tags($this->request()->getValue("postid"));
-        if (is_numeric($postId * 1)) {
+        if (is_numeric($postId)) {
             $comments = Comment::getAll("actuality_id = ?", [$postId]);
             foreach ($comments as $comment) {
                 try {
@@ -236,7 +238,7 @@ class HomeController extends AControllerBase
         if (Auth::isLogged()) {
             $msgText = strip_tags($this->request()->getValue("comment"));
             $post_id = strip_tags($this->request()->getValue("post_id"));
-            $author_id = Auth::getId();
+            $author_id = Auth::getUserId();
             if (strlen($msgText) < 3 || !is_numeric($post_id)) {
                 return $this->json("Error");
             }
