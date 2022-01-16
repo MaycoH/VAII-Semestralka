@@ -92,7 +92,7 @@ class HomeController extends AControllerBase
     {
         $postId = strip_tags($this->request()->getValue('postid')); // Najskôr hľadá kľúč v poli "_POST", potom v poli "_GET" a ak ho nenájde, vráti NULL.
 
-        if ($postId * 1 && Auth::isAdmin()) {                          // Ak sme post našli
+        if (is_numeric($postId) && Auth::isAdmin()) {                          // Ak sme post našli
             try {
                 $actuality = Aktualita::getOne($postId);
                 $actuality->delete();
