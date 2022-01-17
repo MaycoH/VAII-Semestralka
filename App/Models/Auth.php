@@ -27,18 +27,20 @@ class Auth extends Model
 
     /** Funkcia kontrolujúca, či je užívateľ s daným menom už zaregistrovaný
      * @param $name - Hľadané meno
-     * @return bool True ak sa užívateľ s daným menom našiel v DB, ináč false
-     */
+     * @return bool True ak sa užívateľ s daným menom našiel v DB, ináč false */
     public static function isRegistered($name): bool
     {
-        return Auth::getAll("name = ?", [$name]) ? true : false;
+        try {
+            return Auth::getAll("name = ?", [$name]) ? true : false;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     /** Funkcia slúžiaca na zaregistrovanie nového užívateľa (a jeho zápis do DB)
      * @param $name - Meno užívateľa
      * @param $password - Heslo užívateľa
-     * @return bool True, ak registrácia bola úspešná, ináč false
-     */
+     * @return bool <b>true</b>, ak registrácia bola úspešná, ináč <b>false</b> */
     public static function register($name, $password): bool
     {
         $hash = password_hash($password, PASSWORD_DEFAULT);
@@ -58,8 +60,7 @@ class Auth extends Model
     /** Funkcia slúžiaca pre zmenu hesla užívateľa.
      * @param $oldPassword - Pôvodné heslo používateľa
      * @param $newPassword - Nové heslo používateľa
-     * @return bool True, ak bola zmena úspešná, ináč false
-     */
+     * @return bool <b>true</b>, ak bola zmena úspešná, ináč <b>false</b> */
     public static function changePassword ($oldPassword, $newPassword): bool
     {
 //        $users = Auth::getAll("name = ?", [$username]);
@@ -84,8 +85,7 @@ class Auth extends Model
 
     /** Funkcia slúžiaca pre zmazanie užívateľa.
      * @param $password - Heslo pre overenie užívateľa
-     * @return bool True, ak zmazanie užívateľa prebehlo úspešne, ináč false
-     */
+     * @return bool <b>true</b>, ak zmazanie užívateľa prebehlo úspešne, ináč <b>false</b> */
     public static function deleteAccount ($password): bool
     {
         try {
@@ -94,11 +94,20 @@ class Auth extends Model
             return false;
         }
         if (password_verify($password, $user->password)) {
-            if (Auth::isLogged()) {
-                self::logout();
-            }
             try {
+                foreach (Aktualita::getAll("author_id = ?", [$user->id]) as $aktualita) {
+                    $aktualita->author_id = null;
+                    $aktualita->save();
+                }
+                foreach (Comment::getAll("author_id = ?", [$user->id]) as $comment) {
+                    $comment->author_id = null;
+                    $comment->save();
+                }
                 $user->delete();
+
+                if (Auth::isLogged()) {
+                    self::logout();
+                }
             } catch (\Exception $e) {
                 return false;
             }
@@ -128,41 +137,34 @@ class Auth extends Model
         return false;
     }
 
-    /** Funkcia pre odhlásenie */
-    public static function logout()
+    /** Funkcia pre odhlásenie
+     * @return bool <b>true</b>, ak odhlásenie bolo úspešné, ináč <b>false</b> */
+    public static function logout(): bool
     {
         if (isset($_SESSION['userId'])) {
             unset($_SESSION['userId']);
-        }
+            return true;
+        } else return false;
     }
 
     /** Funkcia, ktorá informuje či je používateľ prihlásený
-     * @return bool true, ak je používateľ prihlásený, ináč false
-     */
+     * @return bool <b>true</b>, ak je používateľ prihlásený, ináč <b>false</b> */
     public static function isLogged(): bool
     {
         return isset($_SESSION['userId']);
     }
 
     /** Funkcia, ktorá vráti meno aktuálne prihláseného používateľa
-     * @return mixed|string Meno zo session ak je používateľ prihlásený, ináč vráti "Neprihlásený" */
+     * @return string <b>Meno zo session</b> ak je používateľ prihlásený, ináč vráti "<b>Neprihlásený</b>" */
     public static function getLoggedName()
     {
-//        return ($this->isLogged() ? $_SESSION['name'] : "Neprihlásený");    // Ak je používateľ prihlásený, vráti jeho meno zo session, ináč vráti "Neprihlásený"
-//        return (Auth::isLogged() ? $_SESSION['name'] : "Neprihlásený");       // Ak je používateľ prihlásený, vráti jeho meno zo session, ináč vráti "Neprihlásený"
         return (Auth::isLogged() ? Auth::getOne($_SESSION['userId'])->name : "Neprihlásený");       // Ak je používateľ prihlásený, vráti jeho meno zo session, ináč vráti "Neprihlásený"
     }
 
     /** Funkcia, ktorá vráti užívateľskú rolu
-     * @return string|null Rolu užívateľa, ak má nejakú priradenú, ináč null.
-     */
-    public static function getRole()
+     * @return string Rolu užívateľa, ak má nejakú priradenú. */
+    public static function getRole(): string
     {
-//        $users = Auth::getAll("name = ?", [$_SESSION['name']]);
-//        foreach ($users as $user) {
-//            return $user->role;
-//        }
-//        return null;
         try {
             return Auth::getOne($_SESSION['userId'])->role;
         } catch (\Exception $e) {
@@ -170,19 +172,32 @@ class Auth extends Model
         }
     }
 
-    public static function isAdmin()
+    /** Funkcia, ktorá kontroluje, či má daný užívateľ rolu "<b>Admin</b>"
+     * @return bool <b>true</b>, ak daný užívateľ má nastavenú rolu "<b><i>Admin</i></b>", ináč <b>false</b> */
+    public static function isAdmin(): bool
     {
-        return Auth::isLogged() && Auth::getOne($_SESSION['userId'])->role == "Admin";
+        try {
+            return Auth::isLogged() && Auth::getOne($_SESSION['userId'])->role == "Admin";
+        } catch (\Exception $e) {
+            return false;
+        }
 
     }
-
-    public static function isModerator()
+    /** Funkcia, ktorá kontroluje, či má daný užívateľ rolu "<b>Moderator</b>"
+     * @return bool <b>true</b>, ak daný užívateľ má nastavenú rolu "<b><i>Admin</i></b> alebo rolu "<b><i>Moderator</i></b>", ináč <b>false</b> */
+    public static function isModerator(): bool
     {
-        return Auth::isLogged()
-            && (Auth::getOne($_SESSION['userId'])->role == "Admin"
-            || Auth::getOne($_SESSION['userId'])->role == "Moderator");
+        try {
+            return Auth::isLogged()
+                && (Auth::getOne($_SESSION['userId'])->role == "Admin"
+                    || Auth::getOne($_SESSION['userId'])->role == "Moderator");
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
+    /** Funkcia, ktorá vracia užívateľove ID zo session.
+     * @return int|void ID zo session, ak bolo nastavené. */
     public static function getUserId() {
         if (isset($_SESSION['userId']))
             return $_SESSION['userId'];
