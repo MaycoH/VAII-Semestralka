@@ -121,9 +121,11 @@ function checkInput(input) {
         case "startTime":   // Kontrola platnosti času začiatku
             if (Date.parse(el.value)) {
                 if (Date.parse(el.value) < Date.parse(document.getElementById("endTime").value)) {
+                    setInputOK(el);
                     setInputOK(document.getElementById("endTime"));
                     return true;
                 } else if (Date.parse(el.value) > Date.parse(document.getElementById("endTime").value)) {
+                    setInputOK(el);
                     setInputNG(document.getElementById("endTime"));
                     document.getElementById("endError").innerText = "Udalosť nemôže skončiť skôr než začne!";
                     return false;
