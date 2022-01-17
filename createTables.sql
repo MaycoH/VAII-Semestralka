@@ -5,19 +5,17 @@ grant alter, alter routine, create, create routine, create temporary tables, cre
 
 USE covidinfo;
 # Vytvorenie tabuľky "users"
-create table users
+create table if not exists users
 (
-    id       int auto_increment
-        primary key,
+    id       int auto_increment primary key,
     name     varchar(255)                null,
     password varchar(255)                null,
     role     varchar(255) default 'User' not null
 );
 # Vytvorenie tabuľky "actuality"
-create table actuality
+create table if not exists actuality
 (
-    id        int auto_increment
-        primary key,
+    id        int auto_increment primary key,
     title     varchar(255) null,
     imagePath varchar(255) null,
     perex     varchar(255) null,
@@ -27,7 +25,7 @@ create table actuality
         foreign key (author_id) references users (id)
 );
 # Vytvorenie tabuľky "comments"
-create table comments
+create table if not exists comments
 (
     id              int auto_increment primary key,
     comment         varchar(255) null,
@@ -39,13 +37,11 @@ create table comments
         foreign key (author_id) references users (id)
 );
 # Vytvorenie tabuľky "events"
-create table events
+create table if not exists events
 (
     id               int auto_increment primary key,
     startTime        datetime     null,
     endTime          datetime     null,
     place            varchar(255) null,
-    eventDescription text         null,
-    constraint events_pk
-        primary key (id)
+    eventDescription text         null
 );
