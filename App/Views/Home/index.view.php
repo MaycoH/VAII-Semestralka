@@ -57,8 +57,7 @@ use App\Models\Auth; ?>
                     $pocCl = Configuration::POCET_CLANKOV;
                     isset($_GET["offset"]) ? $offset_tmp = $_GET["offset"] + $pocCl : $offset_tmp = 0;
                     // Kontrola, či existujú staršie články na výpis
-                    $nextPocCl = $offset_tmp + $pocCl;
-                    $count = Connection::connect()->prepare("SELECT * FROM actuality ORDER BY id desc LIMIT $pocCl OFFSET $nextPocCl");    // Pomocou "connect()" si vyžiadam spojenie a preparenem si SQL
+                    $count = Connection::connect()->prepare("SELECT * FROM actuality ORDER BY id desc LIMIT $pocCl OFFSET $offset_tmp");    // Pomocou "connect()" si vyžiadam spojenie a preparenem si SQL
                     $count->execute([]);    // Spustím ho
                     $count2 = $count->fetch();
 
