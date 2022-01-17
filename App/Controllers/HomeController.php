@@ -22,12 +22,16 @@ class HomeController extends AControllerBase
     {
 //        $aktualita = Aktualita::getAll();
         $num = Configuration::POCET_CLANKOV;
-        $aktualita = Aktualita::getAll( "id > 0 ORDER BY id desc LIMIT $num");
-        foreach ($aktualita as $act) {
-            $act->author_id = Auth::getOne($act->author_id)->name;
-        }
+        try {
+            $aktualita = Aktualita::getAll("id > 0 ORDER BY id desc LIMIT $num");
+            foreach ($aktualita as $act) {
+                $act->author_id = Auth::getOne($act->author_id)->name ?? "&lt;Zmazaný účet&gt;";
+            }
 //        $aktualita = Aktualita::getAllJoin('users', "author_id=users.id", 'actuality.*, users.name AS author_id', "actuality.id > 0 ORDER BY id desc LIMIT $num");
-        return $this->html($aktualita);
+            return $this->html($aktualita);
+        } catch (\Exception) {
+            return $this->html("", "TablesNotCreated");
+        }
     }
 
 
@@ -170,7 +174,7 @@ class HomeController extends AControllerBase
             try {
                 $aktualita = Aktualita::getAll("id > 0 ORDER BY id desc LIMIT $num OFFSET $offset");
                 foreach ($aktualita as $act) {
-                    $act->author_id = Auth::getOne($act->author_id)->name;
+                    $act->author_id = Auth::getOne($act->author_id)->name ?? "&lt;Zmazaný účet&gt;";
                 }
             } catch (\Exception $e) { // Neplatné ID
                 $this->redirectToHome();
@@ -218,7 +222,7 @@ class HomeController extends AControllerBase
             $comments = Comment::getAll("actuality_id = ?", [$postId]);
             foreach ($comments as $comment) {
                 try {
-                    $comment->author_id = Auth::getOne($comment->author_id)->name;
+                    $comment->author_id = Auth::getOne($comment->author_id)->name ?? "&lt;Zmazaný účet&gt;";
                 } catch (\Exception $e) {
                 }
             }
