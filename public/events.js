@@ -74,25 +74,24 @@ class Events {
             method: 'POST',
             body: formData
         })
-        .then(response => response.json())  // Lebo odpoveď z Controllera vraciam v JSON. AK by som vracal ako String, použijem .text()
-        .then(response => {                 // Odošleme odpoveď
-            if (response == "wrongStartDateTime")
-                alert("Odpoveď zo servera: \nZadaný neplatný čas začiatku udalosti!");
-            else if (response == "wrongEndDateTime")
-                alert("Odpoveď zo servera: \nZadaný neplatný čas konca udalosti!");
-            else if (response == "cantEndBeforeStart")
-                alert("Odpoveď zo servera: \nUdalosť nemôže skončiť skôr než začne!");
-            else if (response == "wrongDesc")
-                alert("Odpoveď zo servera: \nPopis udalosti je krátky! Musí obsahovať viac ako 5 znakov!");
-            else if (response == "endIsOver")
-                alert("Odpoveď zo servera: \nEvent už skončil!");
-            else if (response == "placeIsShort")
-                alert("Odpoveď zo servera: \nMiesto je neplatné. Musí obsahovať > 5 a < 255 znakov!");
-            else if (response == "notLogged")
-                alert("Odpoveď zo servera: \nNie ste prihlásení, nemôžete pridať novú udalosť!");
-
-        }
-        );
+            .then(response => response.json())  // Lebo odpoveď z Controllera vraciam v JSON. AK by som vracal ako String, použijem .text()
+            .then(response => {                 // Odošleme odpoveď
+                    if (response == "wrongStartDateTime")
+                        alert("Odpoveď zo servera: \nZadaný neplatný čas začiatku udalosti!");
+                    else if (response == "wrongEndDateTime")
+                        alert("Odpoveď zo servera: \nZadaný neplatný čas konca udalosti!");
+                    else if (response == "cantEndBeforeStart")
+                        alert("Odpoveď zo servera: \nUdalosť nemôže skončiť skôr než začne!");
+                    else if (response == "wrongDesc")
+                        alert("Odpoveď zo servera: \nPopis udalosti je krátky! Musí obsahovať viac ako 5 znakov!");
+                    else if (response == "endIsOver")
+                        alert("Odpoveď zo servera: \nEvent už skončil!");
+                    else if (response == "placeIsShort")
+                        alert("Odpoveď zo servera: \nMiesto je neplatné. Musí obsahovať > 5 a < 255 znakov!");
+                    else if (response == "notLogged")
+                        alert("Odpoveď zo servera: \nNie ste prihlásení, nemôžete pridať novú udalosť!");
+                }
+            );
     }
 }
 
@@ -143,17 +142,14 @@ function checkInput(input) {
                     setInputNG(el);
                     document.getElementById("endError").innerText = "Udalosť nemôže skončiť skôr než začne!";
                     return false;
-                }
-                else if(new Date() > Date.parse(el.value)) {
+                } else if (new Date() > Date.parse(el.value)) {
                     setInputNG(el);
                     document.getElementById("endError").innerText = "Udalosť už skončila!";
                     return false;
-                }
-                else if (Date.parse(el.value) > Date.parse(document.getElementById("startTime").value)) {
+                } else if (Date.parse(el.value) > Date.parse(document.getElementById("startTime").value)) {
                     setInputOK(el);
                     return true;
-                }
-                else {
+                } else {
                     setInputNG(el);
                     return false;
                 }
